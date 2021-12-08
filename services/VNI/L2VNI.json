@@ -1,0 +1,124 @@
+[
+    {
+      "path": [
+        "l2BD"
+      ],
+      "rootKeys": [
+        {
+          "parent": "l2BD",
+          "checkReference": [
+            {
+              "fieldNameToCheck": "accEncap",
+              "referenceAliasToRead": "l2BD"
+            }
+          ],
+          "setReference": [
+            {
+              "fieldNameToSet": "id",
+              "referenceAliasToWrite": "sviId"
+            }
+          ]
+        }
+      ],
+      "nodesReference": [
+        {
+          "nodeName": "l2BD",
+          "rootKeys": [
+            "accEncap",
+            "id",
+            "name"
+          ],
+          "nonRootKeys": []
+        }
+      ]
+    },
+    {
+      "path": [
+        "sviIf"
+      ],
+      "rootKeys": [
+        {
+          "parent": "sviIf",
+          "checkReference": [
+            {
+              "fieldNameToCheck": "id",
+              "referenceAliasToRead": "sviId"
+            }
+          ],
+          "setReference": []
+        }
+      ],
+      "nodesReference": [
+        {
+          "nodeName": "sviIf",
+          "rootKeys": [
+            "agw",
+            "ipForward",
+            "vrf",
+            "id",
+            "tag"
+          ],
+          "nonRootKeys": []
+        }
+      ]
+    },
+    {
+      "path": [
+        "rtctrlBDEvi"
+      ],
+      "rootKeys": [
+        {
+          "parent": "rtctrlBDEvi",
+          "checkReference": [
+            {
+              "fieldNameToCheck": "id",
+              "referenceAliasToRead": "l2BD"
+            }
+          ],
+          "setReference": []
+        }
+      ],
+      "nodesReference": [
+        {
+          "nodeName": "rtctrlBDEvi",
+          "rootKeys": [
+            "id",
+            "rd",
+            "rtExport",
+            "rtImport"
+          ],
+          "nonRootKeys": []
+        }
+      ]
+    },
+    {
+      "path": [
+        "nvoNw"
+      ],
+      "rootKeys": [
+        {
+          "parent": "nvoNw",
+          "checkReference": [
+            {
+              "fieldNameToCheck": "id",
+              "referenceAliasToRead": "l2BD"
+            }
+          ],
+          "setReference": []
+        }
+      ],
+      "nodesReference": [
+        {
+          "nodeName": "nvoNw",
+          "rootKeys": [
+            "id",
+            "mcastGroup",
+            "mode",
+            "replicationMethod",
+            "supressArp"
+          ],
+          "nonRootKeys": []
+        }
+      ]
+    }
+  ]

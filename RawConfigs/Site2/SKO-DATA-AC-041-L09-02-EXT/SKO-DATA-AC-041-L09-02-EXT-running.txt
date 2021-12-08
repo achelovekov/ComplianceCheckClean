@@ -1,0 +1,2552 @@
+
+
+!Command: show running-config
+!Running configuration last done at: Sat Jun 19 03:04:59 2021
+!Time: Wed Jun 23 06:42:35 2021
+
+version 9.3(4) Bios:version 05.40 
+hostname SKO-DATA-AC-041-L09-02-EXT
+no vdc combined-hostname
+vdc SKO-DATA-AC-041-L09-02-EXT id 1
+  limit-resource vlan minimum 16 maximum 4094
+  limit-resource vrf minimum 2 maximum 4096
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 248 maximum 248
+  limit-resource u6route-mem minimum 96 maximum 96
+  limit-resource m4route-mem minimum 58 maximum 58
+  limit-resource m6route-mem minimum 8 maximum 8
+
+feature nxapi
+feature bash-shell
+feature tacacs+
+cfs eth distribute
+nv overlay evpn
+feature ospf
+feature bgp
+feature pim
+feature interface-vlan
+feature vn-segment-vlan-based
+feature netflow
+feature lacp
+feature dhcp
+feature vpc
+feature lldp
+feature bfd
+clock timezone MSK 3 0
+feature nv overlay
+feature ngoam
+
+logging level l2fm 5
+logging level spanning-tree 6
+logging level vpc 5
+ngoam install acl
+
+username xxxxxxx password 5 xxxxxxx role network-admin
+username xxxxxxx password 5 xxxxxxx role network-admin
+username xxxxxxxx passphrase  lifetime 99999 warntime 7
+username xxxxxxx password 5 xxxxxxx role network-operator
+username xxxxxxxx passphrase  lifetime 99999 warntime 7
+username xxxxxxx password 5 xxxxxxx role network-operator
+username xxxxxxxx passphrase  lifetime 99999 warntime 7
+username xxxxxxx password 5 xxxxxxx role network-operator
+username xxxxxxxx passphrase  lifetime 99999 warntime 14 gracetime 3
+
+banner motd ^
+UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+You must have explicit, authorized permission to access or configure this device.
+Unauthorized attempts and actions to access or use this system may result in civil or criminal penalties.
+All activities performed on this device are logged and monitored.
+^
+
+no ip domain-lookup
+tacacs-server key 7  xxxxxxxx 
+ip tacacs source-interface mgmt0
+tacacs-server deadtime 5
+tacacs-server host 10.35.66.2 key 7  xxxxxxxx  timeout 5 
+tacacs-server host 10.35.66.1 key 7  xxxxxxxx  
+aaa group server tacacs+ TACACSANYCAST 
+    server 10.35.66.2 
+    server 10.35.66.1 
+    use-vrf management
+    source-interface mgmt0
+logging message interface type ethernet description
+logging event trunk-status default
+ip access-list ACL_PROTECT_NTP
+  10 remark RESTRICT-NTP-ACCESS-FROM-LEGITIMATE-SERVERS-ONLY
+  20 permit ip 10.35.82.127/32 any 
+  30 permit ip 10.35.128.145/32 any 
+  40 permit ip 10.47.65.145/32 any 
+  50 permit ip 10.47.65.140/32 any 
+  60 permit ip 10.47.65.207/32 any 
+  70 permit ip 10.47.65.149/32 any 
+ip access-list ACL_PROTECT_SNMP
+  10 remark RESTRICT-SNMP-ACCESS-FROM-LEGITIMATE-SERVERS-ONLY
+  20 permit ip 10.35.202.0 0.0.1.255 any 
+  30 permit ip 10.35.83.143/32 any 
+  40 permit ip 10.24.12.0 0.0.3.255 any 
+  50 permit ip 10.24.17.0 0.0.0.255 any 
+  60 permit ip 10.35.242.19/32 any 
+  70 permit ip 10.35.242.42/32 any 
+  80 permit ip 10.35.242.43/32 any 
+  90 permit ip 10.35.242.44/32 any 
+  100 permit ip 10.35.242.45/32 any 
+  110 permit ip 10.42.12.160 0.0.0.15 any 
+  120 permit ip 10.35.83.112 0.0.0.15 any 
+  130 permit ip 10.35.129.112 0.0.0.15 any 
+  140 permit ip 10.35.130.107/32 any 
+  150 remark NEW-MONITORING-NETS
+  160 permit ip 10.47.64.0/23 any 
+ip access-list ACL_PROTECT_SSH
+  10 remark RESTRICT-SSH-ACCESS-FROM-LEGITIMATE-HOST-ONLY
+  20 permit ip 10.35.0.0 0.0.255.255 any 
+  30 remark Permit_Legacy_Admins
+  40 permit ip 10.24.12.0/22 any 
+  50 permit ip 10.24.17.0/24 any 
+  60 remark CSPC_EXT
+  70 permit ip 10.42.12.160/28 any 
+  80 remark UNDERLAY-NETS
+  90 permit ip 172.17.112.0 0.0.15.255 any 
+  100 permit ip 10.60.46.0/24 any 
+  110 remark USI-SRV-2021-02-01
+  120 permit ip 10.47.64.0/20 any 
+copp profile strict
+bfd interval 250 min_rx 250 multiplier 3
+configure maintenance profile normal-mode
+  vpc domain 501
+    no shutdown
+  no system interface shutdown
+  sleep instance 1 10
+  router bgp 65541
+    no isolate
+  sleep instance 2 330
+  no ip pim isolate
+  router ospf underlay
+    no isolate
+configure maintenance profile maintenance-mode
+  ip pim isolate
+  router ospf underlay
+    isolate
+  sleep instance 1 10
+  router bgp 65541
+    isolate
+  sleep instance 2 10
+  vpc domain 501
+    shutdown
+  system interface shutdown
+configure terminal
+system mode maintenance always-use-custom-profile
+system mode maintenance snapshot-delay 0
+system mode maintenance maint-delay 0
+snmp-server source-interface traps mgmt0
+snmp-server user xxxxxxxx network-admin auth md5 xxxxxxxx priv xxxxxxxx  localizedkey
+snmp-server user xxxxxxxx network-admin auth sha xxxxxxxx  localizedkey
+snmp-server user xxxxxxxx network-operator auth sha xxxxxxxx  localizedkey
+snmp-server user xxxxxxxx network-operator auth sha xxxxxxxx  localizedkey
+snmp-server user xxxxxxxx network-operator auth sha xxxxxxxx  localizedkey
+snmp-server user xxxxxxxx use-ipv4acl ACL_PROTECT_SNMP
+snmp-server user xxxxxxxx use-ipv4acl ACL_PROTECT_SNMP
+snmp-server user xxxxxxxx use-ipv4acl ACL_PROTECT_SNMP
+snmp-server user xxxxxxxx use-ipv4acl ACL_PROTECT_SNMP
+snmp-server user xxxxxxxx use-ipv4acl ACL_PROTECT_SNMP
+snmp-server host 10.47.65.201 traps version 3 auth xxxxxxxx 
+snmp-server host 10.47.65.201 use-vrf management
+snmp-server host 10.47.65.202 traps version 3 auth xxxxxxxx 
+snmp-server host 10.47.65.202 use-vrf management
+snmp-server host 10.47.65.135 traps version 3 auth xxxxxxxx 
+snmp-server host 10.47.65.135 use-vrf management
+snmp-server host 10.47.65.136 traps version 3 auth xxxxxxxx 
+snmp-server host 10.47.65.136 use-vrf management
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
+snmp-server enable traps callhome event-notify
+snmp-server enable traps callhome smtp-send-fail
+snmp-server enable traps cfs state-change-notif
+snmp-server enable traps lldp lldpRemTablesChange
+snmp-server enable traps cfs merge-failure
+snmp-server enable traps aaa server-state-change
+snmp-server enable traps feature-control FeatureOpStatusChange
+snmp-server enable traps sysmgr cseFailSwCoreNotifyExtended
+snmp-server enable traps config ccmCLIRunningConfigChanged
+snmp-server enable traps snmp authentication
+snmp-server enable traps link cisco-xcvr-mon-status-chg
+snmp-server enable traps vtp notifs
+snmp-server enable traps vtp vlancreate
+snmp-server enable traps vtp vlandelete
+snmp-server enable traps bridge newroot
+snmp-server enable traps bridge topologychange
+snmp-server enable traps stpx inconsistency
+snmp-server enable traps stpx root-inconsistency
+snmp-server enable traps stpx loop-inconsistency
+snmp-server enable traps system Clock-change-notification
+snmp-server enable traps feature-control ciscoFeatOpStatusChange
+snmp-server enable traps mmode cseNormalModeChangeNotify
+snmp-server enable traps mmode cseMaintModeChangeNotify
+ntp server 10.47.65.140 use-vrf management
+ntp server 10.47.65.145 prefer use-vrf management
+ntp server 10.47.65.149 use-vrf management
+ntp server 10.47.65.207 use-vrf management
+ntp source-interface mgmt0
+ntp logging
+ntp access-group peer ACL_PROTECT_NTP
+aaa authentication login default group TACACSANYCAST local 
+aaa authentication login console group TACACSANYCAST local 
+aaa authorization config-commands default group TACACSANYCAST local 
+aaa authorization commands default group TACACSANYCAST local 
+aaa authorization config-commands console group TACACSANYCAST local 
+aaa authorization commands console group TACACSANYCAST local 
+aaa accounting default group TACACSANYCAST local 
+aaa authentication login error-enable 
+aaa authentication login ascii-authentication 
+tacacs-server directed-request 
+aaa bypass-user olvs accounting authorization  
+aaa bypass-user admin accounting authorization  
+
+fabric forwarding anycast-gateway-mac 0000.5e00.0102
+no ip source-route
+ip pim rp-address 172.17.119.41 group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+ip pim sg-expiry-timer 259200
+ip pim bfd
+system vlan long-name
+system vlan nve-overlay id 3901-3966
+vlan 1,4,7-9,14-25,49,160-163,1000,1100,2004,2097-2098,2100,2103,2515,3901,3904,3907,3911,3925,3967
+vlan 4
+  name e25Z_10.46.232.48/28_semarg_C00977763
+  vn-segment 2250004
+vlan 7
+  name e11Z_10.58.144.64/28_semarg-mgmt_C00943635
+  vn-segment 2110007
+vlan 8
+  name e11Z_10.58.145.64/28_semarg-public_C01062140
+  vn-segment 2110008
+vlan 9
+  name eBZ_10.54.224.224/28
+  vn-segment 2070009
+vlan 14
+  name eDZ_10.56.48.0/27_C00970844
+  vn-segment 2040014
+vlan 15
+  name eDZ_10.56.50.0/27_C00970844
+  vn-segment 2040015
+vlan 16
+  name eDZ_10.56.52.0/27_C00970844
+  vn-segment 2040016
+vlan 17
+  name eDZ_10.56.54.0/27_C00970844
+  vn-segment 2040017
+vlan 18
+  name eDZ_10.56.48.32/27_C00970844
+  vn-segment 2040018
+vlan 19
+  name eDZ_10.56.50.32/27_C00970844
+  vn-segment 2040019
+vlan 20
+  name eDZ_10.56.52.32/27_C00970844
+  vn-segment 2040020
+vlan 21
+  name eDZ_10.56.54.32/27_C00970844
+  vn-segment 2040021
+vlan 22
+  name eDZ_10.56.56.0/24_C01013159
+  vn-segment 2040022
+vlan 23
+  name eDZ_10.56.57.0/24_C01013159
+  vn-segment 2040023
+vlan 24
+  name eDZ_10.56.58.0/24_C01013159
+  vn-segment 2040024
+vlan 25
+  name eDZ_10.56.59.0/24_C01013159
+  vn-segment 2040025
+vlan 49
+  name eAZ_10.51.4.16/29_C01267806
+  vn-segment 2010049
+vlan 160
+  name eDZ_10.56.60.0/24_C01013159
+  vn-segment 2040160
+vlan 161
+  name eDZ_10.56.61.0/24_C01013159
+  vn-segment 2040161
+vlan 162
+  name eDZ_10.56.62.0/24_C01013159
+  vn-segment 2040162
+vlan 163
+  name eDZ_10.56.63.0/24_C01013159
+  vn-segment 2040163
+vlan 1000
+  name eMZ_10.60.207.112/29_C01478913
+  vn-segment 2031050
+vlan 1100
+  name eMZ_10.60.203.112/29_C01478913
+  vn-segment 2031150
+vlan 2004
+  name eDZ_iBGP-P2P_over-Peerlink
+vlan 2097
+  name eDZ_10.56.6.0/28
+  vn-segment 2042097
+vlan 2098
+  name eDZ_10.56.6.16/28
+  vn-segment 2042098
+vlan 2100
+  name eDZ_10.56.6.32/28
+  vn-segment 2042100
+vlan 2103
+  name VRF_eMZ
+  vn-segment 2030000
+vlan 2515
+  name eMZ_10.35.128.0/23
+  vn-segment 2032515
+vlan 3901
+  name VRF_eAZ
+  vn-segment 2010000
+vlan 3904
+  name VRF_eDZ
+  vn-segment 2040000
+vlan 3907
+  name VRF_eBZ
+  vn-segment 2070000
+vlan 3911
+  name VRF_e11Z
+  vn-segment 2110000
+vlan 3925
+  name VRF_e25Z
+  vn-segment 2250000
+vlan 3967
+  name VPCL3Peering
+
+cdp format device-id system-name
+spanning-tree vlan 1-3967 priority 24576
+ip prefix-list PL-DEFAULT seq 10 permit 0.0.0.0/0 
+ip prefix-list PL-eDZ-LB-P2P seq 10 permit 10.56.192.0/24 eq 30 
+ip prefix-list PL-eDZ-LB-TECH seq 10 permit 10.56.193.0/24 le 32 
+ip prefix-list PL-eDZ-LB-VIPS seq 10 permit 10.36.40.0/22 le 32 
+route-map RM-DEF-TO-LB permit 10
+  match ip address prefix-list PL-DEFAULT 
+route-map RM-REDIST-SUBNET-e11Z permit 10
+  match tag 3911 
+route-map RM-REDIST-SUBNET-e25Z permit 10
+  match tag 3925 
+route-map RM-REDIST-SUBNET-eAZ permit 10
+  match tag 3901 
+route-map RM-REDIST-SUBNET-eBZ permit 10
+  match tag 3907 
+route-map RM-REDIST-SUBNET-eDZ permit 10
+  match tag 3904 
+route-map RM-REDIST-SUBNET-eMZ permit 10
+  match tag 2103 
+route-map RM-REDIST-SUBNET-eMZ permit 20
+  match tag 3903 
+route-map RM-eDZ-FROM-LB permit 10
+  match ip address prefix-list PL-eDZ-LB-VIPS 
+  set community 655:1002 additive 
+route-map RM-eDZ-FROM-LB permit 20
+  match ip address prefix-list PL-eDZ-LB-TECH 
+  set community 655:1002 additive 
+route-map RM-eDZ-TO-LEAF permit 10
+  match ip address prefix-list PL-eDZ-LB-P2P 
+route-map RM-eDZ-TO-LEAF permit 20
+  match ip address prefix-list PL-eDZ-LB-VIPS 
+route-map RM-eDZ-TO-LEAF permit 30
+  match ip address prefix-list PL-eDZ-LB-TECH 
+flow timeout 60
+service dhcp
+ip dhcp relay
+no ipv6 dhcp relay
+vrf context e11Z
+  vni 2110000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2110000
+    route-target import 62000:2110000 evpn
+    route-target export 62000:2110000
+    route-target export 62000:2110000 evpn
+vrf context e25Z
+  vni 2250000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2250000
+    route-target import 62000:2250000 evpn
+    route-target export 62000:2250000
+    route-target export 62000:2250000 evpn
+vrf context eAZ
+  vni 2010000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2010000
+    route-target import 62000:2010000 evpn
+    route-target export 62000:2010000
+    route-target export 62000:2010000 evpn
+vrf context eBZ
+  vni 2070000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2070000
+    route-target import 62000:2070000 evpn
+    route-target export 62000:2070000
+    route-target export 62000:2070000 evpn
+vrf context eDZ
+  vni 2040000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2040000
+    route-target import 62000:2040000 evpn
+    route-target export 62000:2040000
+    route-target export 62000:2040000 evpn
+vrf context eMZ
+  vni 2030000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2030000
+    route-target import 62000:2030000 evpn
+    route-target export 62000:2030000
+    route-target export 62000:2030000 evpn
+vrf context management
+  ip route 0.0.0.0/0 10.43.131.126
+hardware rate-limiter netflow 6000 
+system nve infra-vlans 3967
+vpc domain 501
+  peer-switch
+  role priority 200
+  system-priority 100
+  peer-keepalive destination 10.43.131.7 source 10.43.131.8
+  delay restore 120
+  peer-gateway
+  auto-recovery
+  delay restore interface-vlan 150
+  fast-convergence
+  ip arp synchronize
+flow exporter NFE1
+  description Export to EXT Duplicator 041
+  destination 10.35.206.100 use-vrf management
+  transport udp 9996
+  source mgmt0
+  version 9
+    template data timeout 20
+flow record NFR1
+  description IPv4 NetFlow
+  match ipv4 source address
+  match ipv4 destination address
+  match ip protocol
+  match transport source-port
+  match transport destination-port
+  collect transport tcp flags
+  collect counter bytes long
+  collect counter packets long
+  collect timestamp sys-uptime first
+  collect timestamp sys-uptime last
+flow monitor NFM1
+  description IPv4 NetFlow monitor for VLAN
+  record NFR1
+  exporter NFE1
+flow monitor NFM2
+  description IPv4 NetFlow monitor for SVI
+  record NFR1
+  exporter NFE1
+vlan configuration 4,7-9,14-25,49,160-163,1000,1100,2097-2098,2100,2515
+  ip flow monitor NFM1 input  
+
+nxapi use-vrf management
+
+
+interface Vlan1
+  no ip redirects
+  no ipv6 redirects
+
+interface Vlan4
+  no shutdown
+  mtu 9216
+  vrf member e25Z
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.46.232.62/28 tag 3925
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan7
+  no shutdown
+  mtu 9216
+  vrf member e11Z
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.58.144.78/28 tag 3911
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan8
+  no shutdown
+  mtu 9216
+  vrf member e11Z
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.58.145.78/28 tag 3911
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan9
+  no shutdown
+  mtu 9216
+  vrf member eBZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.54.224.238/28 tag 3907
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan14
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.48.30/27 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+  ip dhcp relay address 10.56.32.70 
+
+interface Vlan15
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.50.30/27 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan16
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.52.30/27 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan17
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.54.30/27 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan18
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.48.62/27 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+  ip dhcp relay address 10.56.32.70 
+
+interface Vlan19
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.50.62/27 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan20
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.52.62/27 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan21
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.54.62/27 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan22
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.56.250/24 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan23
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.57.250/24 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan24
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.58.250/24 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan25
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.59.250/24 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan49
+  no shutdown
+  mtu 9216
+  vrf member eAZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.51.4.22/29 tag 3901
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan160
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.60.250/24 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan161
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.61.250/24 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan162
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.62.250/24 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan163
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.63.250/24 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan1000
+  no shutdown
+  mtu 9216
+  vrf member eMZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.60.207.118/29 tag 3903
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan1100
+  no shutdown
+  mtu 9216
+  vrf member eMZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.60.203.118/29 tag 3903
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan2004
+  description eDZ_iBGP-P2P_over-Peerlink
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  no ip redirects
+  ip address 10.56.192.203/31 tag 3904
+  no ipv6 redirects
+
+interface Vlan2097
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.6.14/28 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan2098
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.6.30/28 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan2100
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.56.6.46/28 tag 3904
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan2103
+  description VRF_eMZ
+  no shutdown
+  mtu 9216
+  vrf member eMZ
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan2515
+  no shutdown
+  mtu 9216
+  vrf member eMZ
+  ip flow monitor NFM2 input  
+  no ip redirects
+  ip address 10.35.129.250/23 tag 2103
+  no ipv6 redirects
+  fabric forwarding mode anycast-gateway
+
+interface Vlan3901
+  description L3_VNI_FOR_eAZ_2010000
+  no shutdown
+  mtu 9216
+  vrf member eAZ
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan3904
+  description VRF_eDZ
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan3907
+  description L3_VNI_FOR_eBZ_2070000
+  no shutdown
+  mtu 9216
+  vrf member eBZ
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan3911
+  description L3_VNI_FOR_e11Z_2110000
+  no shutdown
+  mtu 9216
+  vrf member e11Z
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan3925
+  description L3_VNI_FOR_e25Z_2250000
+  no shutdown
+  mtu 9216
+  vrf member e25Z
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan3967
+  description VPC Layer-3 Peering for VXLAN
+  no shutdown
+  mtu 9216
+  no ip redirects
+  ip address 172.17.116.193/31
+  no ipv6 redirects
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+
+interface port-channel101
+  description ---IAE_kamarong2-2102311GHE10H6000252_data_CI00910721_C00896435___C01044174
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2515
+  switchport trunk allowed vlan 2515
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 101
+
+interface port-channel102
+  description ---IAE_farm33_data_CI01106240_C00896435_C00994811
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2098
+  switchport trunk allowed vlan 2098
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 102
+
+interface port-channel103
+  description ---IAE_farm14_data_CI01106255_C00896435_C00994811_C01023827
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2100
+  switchport trunk allowed vlan 2100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 103
+
+interface port-channel104
+  description ---IAE_farm10_data_CI01106257_C00896435_C00994811_C01023827
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2100
+  switchport trunk allowed vlan 2100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 104
+
+interface port-channel105
+  description ---IAE_farm32_data_CI01106250_C00896435_C00994811
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2098
+  switchport trunk allowed vlan 2098
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 105
+
+interface port-channel106
+  description ---IAE_farm9_data_CI01106256_C00896435_C00994811_C01023827
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2100
+  switchport trunk allowed vlan 2098,2100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 106
+
+interface port-channel107
+  description ---IAE_farm12_data_CI01106252_C00896435_C00994811_C01011233
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2097
+  switchport trunk allowed vlan 2097
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 107
+
+interface port-channel108
+  description ---IAE_farm11_data_CI01106258_C00896435_C00994811_C01023827
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2100
+  switchport trunk allowed vlan 2100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 108
+
+interface port-channel109
+  description ---IAE_farm34_data_CI01106245_C00896435_C00994811
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2098
+  switchport trunk allowed vlan 2098
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 109
+
+interface port-channel110
+  description ---IAE_farm13_data_CI01106146_C00896435_C00994811_C01011233
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2097
+  switchport trunk allowed vlan 2097
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 110
+
+interface port-channel111
+  description ---IAE_farm31_data_CI01106247_C00896435_C00994811
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2098
+  switchport trunk allowed vlan 2098
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 111
+
+interface port-channel112
+  description ---ITE_fls35-01_data_CI01911053_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 112
+
+interface port-channel113
+  description ---ITE_fls35-02_data_CI01911054_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 113
+
+interface port-channel114
+  description ---ITE_fls35-03_data_CI01911055_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 114
+
+interface port-channel115
+  description ---ITE_fls35-04_data_CI01911058_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 115
+
+interface port-channel116
+  description ---ITE_fls35-05_data_CI01911060_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 116
+
+interface port-channel117
+  description ---ITE_fls35-06_data_CI01911061_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 117
+
+interface port-channel118
+  description ---ITE_fls35-07_data_CI01911062_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 118
+
+interface port-channel119
+  description ---ITE_fls35-08_data_CI01911063_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 119
+
+interface port-channel120
+  description ---ITE_fls35-09_data_CI01911064_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 120
+
+interface port-channel121
+  description ---ITE_fls35-10_data_CI01911065_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 121
+
+interface port-channel122
+  description ---ITE_fls35-11_data_CI01911066_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 122
+
+interface port-channel123
+  description ---ITE_fls35-12_data_CI01911067_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 123
+
+interface port-channel124
+  description ---ITE_fls35-13_data_CI01911068_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 124
+
+interface port-channel125
+  description ---ITE_fls35-14_data_CI01911069_C00970844_C01072498
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 125
+
+interface port-channel126
+  description ---IAE_2102311XBJN0JC000152_Data_CI01795879_C00997651
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 9
+  switchport trunk allowed vlan 9
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 126
+
+interface port-channel127
+  description ---IAE_2102311XBJN0JC000155_Data_CI01795877_C00997651
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 9
+  switchport trunk allowed vlan 9
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 127
+
+interface port-channel128
+  description ---IAE_2102311XBJN0JC000159_Data_CI01795769_C00997651
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 9
+  switchport trunk allowed vlan 9
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 128
+
+interface port-channel129
+  description ---IAE_semargl19-2102311XBHN0JC000074_Data_CI01795688_C01018062
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 7
+  switchport trunk allowed vlan 7-8
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 129
+
+interface port-channel130
+  description ---IAE_semargl19-2102311XBHN0JC000074_Data_CI01795688_C01018062
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 4
+  switchport trunk allowed vlan 4
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 130
+
+interface port-channel131
+  description ---IAE_semargl20-2102311XBHN0JC000122_Data_CI01795689_C01018062
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 7
+  switchport trunk allowed vlan 7-8
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 131
+
+interface port-channel132
+  description ---IAE_semargl21-2102311XBHN0JC000112-_Data_CI01795795_C01018062
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 7
+  switchport trunk allowed vlan 7-8
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 132
+
+interface port-channel133
+  description ---IAE_semargl22-2102311XBHN0JC000111_Data_CI01795794_C01018062
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 7
+  switchport trunk allowed vlan 7-8
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 133
+
+interface port-channel134
+  description ---IAE_semargl23-2102311XBHN0JC000109_Data_CI01795806_C01018062
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 7
+  switchport trunk allowed vlan 7-8
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  vpc 134
+
+interface port-channel135
+  description ---IAE_S4BBQ328_Data_C01098792
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 135
+
+interface port-channel136
+  description ---IAE_S4BBQ330_Data_C01098792
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 136
+
+interface port-channel137
+  description ---IAE_S4BBQ331_Data_C01098791
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 137
+
+interface port-channel138
+  description ---IAE_S4BBQ335_Data_C0109879
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 138
+
+interface port-channel139
+  description ---IAE_CZ29290PJ9-HPE-DL380-Gen10_data_CI02177639_C01295242
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 49
+  switchport trunk allowed vlan 49
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 139
+
+interface port-channel140
+  description ---IAE_CZ29290PJD-HPE-DL380-Gen10_data_CI02177640_C01295242
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 49
+  switchport trunk allowed vlan 49
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 140
+
+interface port-channel141
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 141
+
+interface port-channel142
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 142
+
+interface port-channel143
+  description ---NOTUSE_C01478997
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 143
+
+interface port-channel144
+  description ---NOTUSE_C01478997
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 144
+
+interface port-channel145
+  description ---NOTUSE_C01478997
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 145
+
+interface port-channel146
+  description ---NOTUSE_C01478997
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 146
+
+interface port-channel147
+  description ---NOTUSE_C01478997
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 147
+
+interface port-channel148
+  description ---NOTUSE_C01478997
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  vpc 148
+
+interface port-channel3967
+  description vPC_peerlink
+  switchport
+  switchport mode trunk
+  spanning-tree port type network
+  vpc peer-link
+
+interface nve1
+  no shutdown
+  description VTEP
+  host-reachability protocol bgp
+  advertise virtual-rmac
+  source-interface loopback1
+  source-interface hold-down-time 500
+  member vni 2010000 associate-vrf
+  member vni 2010049
+    mcast-group 225.1.0.1
+  member vni 2030000 associate-vrf
+  member vni 2031050
+    ingress-replication protocol bgp
+  member vni 2031150
+    ingress-replication protocol bgp
+  member vni 2032515
+    mcast-group 225.1.0.3
+  member vni 2040000 associate-vrf
+  member vni 2040014
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040015
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040016
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040017
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040018
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040019
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040020
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040021
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040022
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040023
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040024
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040025
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040160
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040161
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040162
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2040163
+    suppress-arp
+    mcast-group 225.1.0.4
+  member vni 2042097
+    mcast-group 225.1.0.4
+  member vni 2042098
+    mcast-group 225.1.0.4
+  member vni 2042100
+    mcast-group 225.1.0.4
+  member vni 2070000 associate-vrf
+  member vni 2070009
+    suppress-arp
+    mcast-group 225.1.0.7
+  member vni 2110000 associate-vrf
+  member vni 2110007
+    suppress-arp
+    mcast-group 225.1.0.11
+  member vni 2110008
+    suppress-arp
+    mcast-group 225.1.0.11
+  member vni 2250000 associate-vrf
+  member vni 2250004
+    suppress-arp
+    mcast-group 225.1.0.25
+
+interface Ethernet1/1
+  description ---IAE_kamarong2-2102311GHE10H6000252_data_CI00910721_C00896435___C01044174
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2515
+  switchport trunk allowed vlan 2515
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 101 mode active
+  no shutdown
+
+interface Ethernet1/2
+  description ---IAE_farm33_data_CI01106240_C00896435_C00994811
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2098
+  switchport trunk allowed vlan 2098
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 102 mode active
+  no shutdown
+
+interface Ethernet1/3
+  description ---IAE_farm14_data_CI01106255_C00896435_C00994811
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2100
+  switchport trunk allowed vlan 2100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 103 mode active
+  no shutdown
+
+interface Ethernet1/4
+  description ---IAE_farm10_data_CI01106257_C00896435_C00994811
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2100
+  switchport trunk allowed vlan 2100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 104 mode active
+  no shutdown
+
+interface Ethernet1/5
+  description ---IAE_farm32_data_CI01106250_C00896435_C00994811
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2098
+  switchport trunk allowed vlan 2098
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 105 mode active
+  no shutdown
+
+interface Ethernet1/6
+  description ---IAE_farm9_data_CI01106256_C00896435_C00994811
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2100
+  switchport trunk allowed vlan 2098,2100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 106 mode active
+  no shutdown
+
+interface Ethernet1/7
+  description ---IAE_farm12_data_CI01106252_C00896435_C00994811
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2097
+  switchport trunk allowed vlan 2097
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 107 mode active
+  no shutdown
+
+interface Ethernet1/8
+  description ---IAE_farm11_data_CI01106258_C00896435_C00994811
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2100
+  switchport trunk allowed vlan 2100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 108 mode active
+  no shutdown
+
+interface Ethernet1/9
+  description ---IAE_farm34_data_CI01106245_C00896435_C00994811
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2098
+  switchport trunk allowed vlan 2098
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 109 mode active
+  no shutdown
+
+interface Ethernet1/10
+  description ---IAE_farm13_data_CI01106146_C00896435_C00994811
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2097
+  switchport trunk allowed vlan 2097
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 110 mode active
+  no shutdown
+
+interface Ethernet1/11
+  description ---IAE_farm31_data_CI01106247_C00896435_C00994811
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 2098
+  switchport trunk allowed vlan 2098
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 111 mode active
+  no shutdown
+
+interface Ethernet1/12
+  description ---ITE_fls35-01_data_CI01911053_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 112 mode active
+  no shutdown
+
+interface Ethernet1/13
+  description ---ITE_fls35-02_data_CI01911054_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 113 mode active
+  no shutdown
+
+interface Ethernet1/14
+  description ---ITE_fls35-03_data_CI01911055_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 114 mode active
+  no shutdown
+
+interface Ethernet1/15
+  description ---ITE_fls35-04_data_CI01911058_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 115 mode active
+  no shutdown
+
+interface Ethernet1/16
+  description ---ITE_fls35-05_data_CI01911060_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 116 mode active
+  no shutdown
+
+interface Ethernet1/17
+  description ---ITE_fls35-06_data_CI01911061_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 117 mode active
+  no shutdown
+
+interface Ethernet1/18
+  description ---ITE_fls35-07_data_CI01911062_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 14
+  switchport trunk allowed vlan 14-17,22-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 118 mode active
+  no shutdown
+
+interface Ethernet1/19
+  description ---ITE_fls35-08_data_CI01911063_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 119 mode active
+  no shutdown
+
+interface Ethernet1/20
+  description ---ITE_fls35-09_data_CI01911064_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 120 mode active
+  no shutdown
+
+interface Ethernet1/21
+  description ---ITE_fls35-10_data_CI01911065_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 121 mode active
+  no shutdown
+
+interface Ethernet1/22
+  description ---ITE_fls35-11_data_CI01911066_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 122 mode active
+  no shutdown
+
+interface Ethernet1/23
+  description ---ITE_fls35-12_data_CI01911067_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 123 mode active
+  no shutdown
+
+interface Ethernet1/24
+  description ---ITE_fls35-13_data_CI01911068_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 124 mode active
+  no shutdown
+
+interface Ethernet1/25
+  description ---ITE_fls35-14_data_CI01911069_C00970844_C01072498
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 18
+  switchport trunk allowed vlan 18-25,160-163
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  channel-group 125 mode active
+  no shutdown
+
+interface Ethernet1/26
+  description ---IAE_2102311XBJN0JC000152_Data_CI01795879_C00997651
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 9
+  switchport trunk allowed vlan 9
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 126 mode active
+  no shutdown
+
+interface Ethernet1/27
+  description ---IAE_2102311XBJN0JC000155_Data_CI01795877_C00997651
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 9
+  switchport trunk allowed vlan 9
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 127 mode active
+  no shutdown
+
+interface Ethernet1/28
+  description ---IAE_2102311XBJN0JC000159_Data_CI01795769_C00997651
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 9
+  switchport trunk allowed vlan 9
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 128 mode active
+  no shutdown
+
+interface Ethernet1/29
+  description ---IAE_semargl19-2102311XBHN0JC000074_Data_CI01795688_C01018062
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 7
+  switchport trunk allowed vlan 7-8
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 129 mode active
+  no shutdown
+
+interface Ethernet1/30
+  description ---IAE_semargl19-2102311XBHN0JC000074_Data_CI01795688_C01018062
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 4
+  switchport trunk allowed vlan 4
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 130 mode active
+  no shutdown
+
+interface Ethernet1/31
+  description ---IAE_semargl20-2102311XBHN0JC000122_Data_CI01795689_C01018062
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 7
+  switchport trunk allowed vlan 7-8
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 131 mode active
+  no shutdown
+
+interface Ethernet1/32
+  description ---IAE_semargl21-2102311XBHN0JC000112-_Data_CI01795795_C01018062
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 7
+  switchport trunk allowed vlan 7-8
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 132 mode active
+  no shutdown
+
+interface Ethernet1/33
+  description ---IAE_semargl22-2102311XBHN0JC000111_Data_CI01795794_C01018062
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 7
+  switchport trunk allowed vlan 7-8
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 133 mode active
+  no shutdown
+
+interface Ethernet1/34
+  description ---IAE_semargl23-2102311XBHN0JC000109_Data_CI01795806_C01018062
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 7
+  switchport trunk allowed vlan 7-8
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  channel-group 134 mode active
+  no shutdown
+
+interface Ethernet1/35
+  description ---IAE_S4BBQ328_Data_C01098792
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  channel-group 135 mode active
+  no shutdown
+
+interface Ethernet1/36
+  description ---IAE_S4BBQ330_Data_C01098792
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  channel-group 136 mode active
+  no shutdown
+
+interface Ethernet1/37
+  description ---IAE_S4BBQ331_Data_C01098791
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  channel-group 137 mode active
+  no shutdown
+
+interface Ethernet1/38
+  description ---IAE_S4BBQ335_Data_C01098791
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  channel-group 138 mode active
+  no shutdown
+
+interface Ethernet1/39
+  description ---IAE_CZ29290PJ9-HPE-DL380-Gen10_data_CI02177639_C01295242
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 49
+  switchport trunk allowed vlan 49
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  channel-group 139 mode active
+  no shutdown
+
+interface Ethernet1/40
+  description ---IAE_CZ29290PJD-HPE-DL380-Gen10_data_CI02177640_C01295242
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 49
+  switchport trunk allowed vlan 49
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  channel-group 140 mode active
+  no shutdown
+
+interface Ethernet1/41
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  channel-group 141 mode active
+  no shutdown
+
+interface Ethernet1/42
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  channel-group 142 mode active
+  no shutdown
+
+interface Ethernet1/43
+  description ---ITE_CZ36167J93_data_CI00753237_C01478997
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan 1000,1100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  no shutdown
+
+interface Ethernet1/44
+  description ---ITE_CZ3547N835_data_CI00861983_C01478997
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan 1000,1100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  no shutdown
+
+interface Ethernet1/45
+  description ---ITE_CZ361674X2_data_CI00755367_C01478997
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan 1000,1100
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+  no shutdown
+
+interface Ethernet1/46
+  description ---ITE_CZ36167J93_data_CI00753237_C01478997
+  no cdp enable
+  mtu 9216
+  link debounce time 0
+  no shutdown
+
+interface Ethernet1/46.8
+  mtu 9216
+  encapsulation dot1q 8
+  vrf member eDZ
+  ip address 10.56.192.13/30 tag 3904
+  no shutdown
+
+interface Ethernet1/47
+  description ---ITE_CZ3547N835_data_CI00861983_C01478997
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+
+interface Ethernet1/48
+  description ---ITE_CZ361674X2_data_CI00755367_C01478997
+  no cdp enable
+  switchport
+  switchport mode trunk
+  switchport trunk native vlan 666
+  switchport trunk allowed vlan none
+  spanning-tree port type edge trunk
+  spanning-tree bpduguard enable
+  mtu 9216
+  link debounce time 0
+  storm-control broadcast level 0.10
+  storm-control unicast level 1.00
+  storm-control action trap
+
+interface Ethernet1/49
+  description ---NNS_SKO-DATA-AG-041-K04-01-EXT_Eth4/1
+  mtu 9216
+  link debounce time 0
+  no ip redirects
+  ip address 172.17.124.25/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  no shutdown
+
+interface Ethernet1/50
+  description ---NNS_SKO-DATA-AG-041-M04-01-EXT_Eth4/1
+  mtu 9216
+  no ip redirects
+  ip address 172.17.124.27/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  no shutdown
+
+interface Ethernet1/51
+  description ---NNS_SKO-DATA-AG-041-O04-01-EXT_Eth4/1
+  mtu 9216
+  no ip redirects
+  ip address 172.17.124.29/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  no shutdown
+
+interface Ethernet1/52
+  description ---NNS_SKO-DATA-AG-041-Q04-01-EXT_Eth4/1
+  mtu 9216
+  no ip redirects
+  ip address 172.17.124.31/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  no shutdown
+
+interface Ethernet1/53
+  description vPC_peerlink
+  switchport
+  switchport mode trunk
+  channel-group 3967 mode active
+  no shutdown
+
+interface Ethernet1/54
+  description vPC_peerlink
+  switchport
+  switchport mode trunk
+  channel-group 3967 mode active
+  no shutdown
+
+interface mgmt0
+  description ---NNE_SKO-NETM-AC-041-O04-01-EXT_Gi1/0/12
+  no cdp enable
+  vrf member management
+  ip address 10.43.131.8/25
+
+interface loopback0
+  description ROUTER_ID_lo0
+  ip address 172.17.126.4/32
+  ip router ospf underlay area 0.0.4.1
+  ip pim sparse-mode
+
+interface loopback1
+  description ANYCAST_VTEP_lo1
+  ip address 172.17.127.4/32
+  ip address 172.17.126.130/32 secondary
+  ip router ospf underlay area 0.0.4.1
+  ip pim sparse-mode
+cli alias name wr copy running-config startup-config
+line console
+  exec-timeout 15
+line vty
+  session-limit 14
+  exec-timeout 15
+  access-class ACL_PROTECT_SSH in
+boot nxos bootflash:/nxos.9.3.4.bin 
+router ospf underlay
+  bfd
+  router-id 172.17.126.4
+  log-adjacency-changes
+  timers throttle spf 10 100 5000
+  timers lsa-group-pacing 10
+  timers lsa-arrival 80
+  timers throttle lsa 10 100 5000
+router bgp 65541
+  router-id 172.17.126.4
+  graceful-restart stalepath-time 1800
+  no enhanced-error
+  log-neighbor-changes
+  address-family ipv4 unicast
+  address-family l2vpn evpn
+    nexthop trigger-delay critical 1 non-critical 1
+    advertise-pip
+  template peer LB-ASN32-PEERS
+    bfd
+    log-neighbor-changes
+    address-family ipv4 unicast
+      route-map RM-DEF-TO-LB out
+      maximum-prefix 1000 warning-only
+      default-originate
+  template peer SPINE-PEERS
+    remote-as 65541
+    update-source loopback0
+    address-family ipv4 unicast
+    address-family l2vpn evpn
+      send-community
+      send-community extended
+      maximum-prefix 100000 warning-only
+  template peer VPC-PEERS
+    bfd
+    remote-as 65541
+    address-family ipv4 unicast
+      send-community
+      send-community extended
+      maximum-prefix 10000 warning-only
+      next-hop-self
+  neighbor 172.17.119.93
+    inherit peer SPINE-PEERS
+    description SKO-DATA-AG-041-K04-01-EXT
+  neighbor 172.17.119.94
+    inherit peer SPINE-PEERS
+    description SKO-DATA-AG-041-M04-01-EXT
+  neighbor 172.17.119.95
+    inherit peer SPINE-PEERS
+    description SKO-DATA-AG-041-O04-01-EXT
+  neighbor 172.17.119.96
+    inherit peer SPINE-PEERS
+    description SKO-DATA-AG-041-Q04-01-EXT
+  vrf e11Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      advertise l2vpn evpn
+      redistribute direct route-map RM-REDIST-SUBNET-e11Z
+      maximum-paths ibgp 4
+  vrf e25Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      advertise l2vpn evpn
+      redistribute direct route-map RM-REDIST-SUBNET-e25Z
+      maximum-paths ibgp 4
+  vrf eAZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      advertise l2vpn evpn
+      redistribute direct route-map RM-REDIST-SUBNET-eAZ
+      maximum-paths ibgp 4
+  vrf eBZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      advertise l2vpn evpn
+      redistribute direct route-map RM-REDIST-SUBNET-eBZ
+      maximum-paths ibgp 4
+  vrf eDZ
+    router-id 172.17.126.4
+    graceful-restart stalepath-time 1800
+    bestpath as-path multipath-relax
+    address-family ipv4 unicast
+      advertise l2vpn evpn
+      redistribute direct route-map RM-REDIST-SUBNET-eDZ
+      maximum-paths 32
+      maximum-paths ibgp 4
+    neighbor 10.56.192.14
+      inherit peer LB-ASN32-PEERS
+      remote-as 1582199812
+      description eBGP_for_LB_L3_termination
+      address-family ipv4 unicast
+        route-map RM-eDZ-FROM-LB in
+    neighbor 10.56.192.202
+      inherit peer VPC-PEERS
+      description iBGP_with_LEAF_at_VPC_pair
+      address-family ipv4 unicast
+        route-map RM-eDZ-TO-LEAF out
+  vrf eMZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      advertise l2vpn evpn
+      redistribute direct route-map RM-REDIST-SUBNET-eMZ
+      maximum-paths ibgp 4
+evpn
+  vni 2032515 l2
+    rd auto
+    route-target import 62000:2032515
+    route-target export 62000:2032515
+  vni 2040014 l2
+    rd auto
+    route-target import 62000:2040014
+    route-target export 62000:2040014
+  vni 2040015 l2
+    rd auto
+    route-target import 62000:2040015
+    route-target export 62000:2040015
+  vni 2040016 l2
+    rd auto
+    route-target import 62000:2040016
+    route-target export 62000:2040016
+  vni 2040017 l2
+    rd auto
+    route-target import 62000:2040017
+    route-target export 62000:2040017
+  vni 2040018 l2
+    rd auto
+    route-target import 62000:2040018
+    route-target export 62000:2040018
+  vni 2040019 l2
+    rd auto
+    route-target import 62000:2040019
+    route-target export 62000:2040019
+  vni 2040020 l2
+    rd auto
+    route-target import 62000:2040020
+    route-target export 62000:2040020
+  vni 2040021 l2
+    rd auto
+    route-target import 62000:2040021
+    route-target export 62000:2040021
+  vni 2040022 l2
+    rd auto
+    route-target import 62000:2040022
+    route-target export 62000:2040022
+  vni 2040023 l2
+    rd auto
+    route-target import 62000:2040023
+    route-target export 62000:2040023
+  vni 2040024 l2
+    rd auto
+    route-target import 62000:2040024
+    route-target export 62000:2040024
+  vni 2040025 l2
+    rd auto
+    route-target import 62000:2040025
+    route-target export 62000:2040025
+  vni 2040026 l2
+    rd auto
+    route-target import 62000:2040026
+    route-target export 62000:2040026
+  vni 2040027 l2
+    rd auto
+    route-target import 62000:2040027
+    route-target export 62000:2040027
+  vni 2042097 l2
+    rd auto
+    route-target import 62000:2042097
+    route-target export 62000:2042097
+  vni 2042098 l2
+    rd auto
+    route-target import 62000:2042098
+    route-target export 62000:2042098
+  vni 2042100 l2
+    rd auto
+    route-target import 62000:2042100
+    route-target export 62000:2042100
+
+l2rib dup-host-mac-detection 6 60
+l2rib dup-host-mac-recovery 120 3000
+logging logfile messages 6
+logging server 10.47.65.201 6 use-vrf management
+logging server 10.47.65.135 6 use-vrf management
+logging server 10.47.65.145 6 use-vrf management
+logging source-interface mgmt0
+logging timestamp milliseconds
+logging monitor 7
+no logging console
+logging origin-id hostname
+
+

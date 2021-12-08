@@ -1,0 +1,4205 @@
+
+
+!Command: show running-config
+!Running configuration last done at: Sat Jun 19 02:55:14 2021
+!Time: Wed Jun 23 06:42:32 2021
+
+version 9.3(4) Bios:version 05.40 
+switchname SKO-DATA-AG-041-M04-01-EXT
+no vdc combined-hostname
+vdc SKO-DATA-AG-041-M04-01-EXT id 1
+  limit-resource vlan minimum 16 maximum 4094
+  limit-resource vrf minimum 2 maximum 4096
+  limit-resource port-channel minimum 0 maximum 511
+  limit-resource u4route-mem minimum 248 maximum 248
+  limit-resource u6route-mem minimum 96 maximum 96
+  limit-resource m4route-mem minimum 58 maximum 58
+  limit-resource m6route-mem minimum 8 maximum 8
+
+feature nxapi
+feature bash-shell
+feature tacacs+
+nv overlay evpn
+feature ospf
+feature bgp
+feature pim
+feature fabric forwarding
+feature interface-vlan
+feature vn-segment-vlan-based
+feature lacp
+feature lldp
+feature bfd
+clock timezone MSK 3 0
+feature nv overlay
+evpn multisite border-gateway 65541
+  delay-restore time 1000
+feature ngoam
+
+logging level l2fm 5
+logging level spanning-tree 6
+ngoam install acl
+
+username xxxxxxx password 5 xxxxxxx role network-admin
+username xxxxxxx password 5 xxxxxxx role network-admin
+username xxxxxxxx passphrase  lifetime 99999 warntime 14 gracetime 3
+username xxxxxxx password 5 xxxxxxx role network-operator
+username xxxxxxxx passphrase  lifetime 99999 warntime 14 gracetime 3
+username xxxxxxx password 5 xxxxxxx role network-operator
+username xxxxxxxx passphrase  lifetime 99999 warntime 14 gracetime 3
+username xxxxxxx password 5 xxxxxxx role network-operator
+username xxxxxxxx passphrase  lifetime 99999 warntime 14 gracetime 3
+
+banner motd ^
+UNAUTHORIZED ACCESS TO THIS DEVICE IS PROHIBITED
+You must have explicit, authorized permission to access or configure this device.
+Unauthorized attempts and actions to access or use this system may result in civil or criminal penalties.
+All activities performed on this device are logged and monitored.
+^
+
+no ip domain-lookup
+tacacs-server key 7  xxxxxxxx 
+ip tacacs source-interface mgmt0
+tacacs-server deadtime 5
+tacacs-server host 10.35.66.2 key 7  xxxxxxxx  timeout 5 
+tacacs-server host 10.35.66.1 key 7  xxxxxxxx  
+aaa group server tacacs+ TACACSANYCAST 
+    server 10.35.66.2 
+    server 10.35.66.1 
+    use-vrf management
+    source-interface mgmt0
+logging message interface type ethernet description
+logging event trunk-status default
+ip access-list ACL_PROTECT_NTP
+  10 remark RESTRICT-NTP-ACCESS-FROM-LEGITIMATE-SERVERS-ONLY
+  20 permit ip 10.35.82.127/32 any 
+  30 permit ip 10.35.128.145/32 any 
+  40 permit ip 10.47.65.145/32 any 
+  50 permit ip 10.47.65.140/32 any 
+  60 permit ip 10.47.65.207/32 any 
+  70 permit ip 10.47.65.149/32 any 
+ip access-list ACL_PROTECT_SNMP
+  10 remark RESTRICT-SNMP-ACCESS-FROM-LEGITIMATE-SERVERS-ONLY
+  20 permit ip 10.35.202.0 0.0.1.255 any 
+  30 permit ip 10.35.83.143/32 any 
+  40 permit ip 10.24.12.0 0.0.3.255 any 
+  50 permit ip 10.24.17.0 0.0.0.255 any 
+  60 permit ip 10.35.242.19/32 any 
+  70 permit ip 10.35.242.42/32 any 
+  80 permit ip 10.35.242.43/32 any 
+  90 permit ip 10.35.242.44/32 any 
+  100 permit ip 10.35.242.45/32 any 
+  110 permit ip 10.42.12.160 0.0.0.15 any 
+  120 permit ip 10.35.83.112 0.0.0.15 any 
+  130 permit ip 10.35.129.112 0.0.0.15 any 
+  140 permit ip 10.35.130.107/32 any 
+  150 remark NEW-MONITORING-NETS
+  160 permit ip 10.47.64.0/23 any 
+ip access-list ACL_PROTECT_SSH
+  10 remark RESTRICT-SSH-ACCESS-FROM-LEGITIMATE-HOST-ONLY
+  20 permit ip 10.35.0.0 0.0.255.255 any 
+  30 remark Permit_Legacy_Admins
+  40 permit ip 10.24.12.0/22 any 
+  50 permit ip 10.24.17.0/24 any 
+  60 remark CSPC_EXT
+  70 permit ip 10.42.12.160/28 any 
+  80 remark UNDERLAY-NETS
+  90 permit ip 172.17.112.0 0.0.15.255 any 
+  100 permit ip 10.60.46.0/24 any 
+  110 remark USI-SRV-2021-02-01
+  120 permit ip 10.47.64.0/20 any 
+copp profile strict
+bfd interval 250 min_rx 250 multiplier 3
+configure maintenance profile normal-mode
+  interface Ethernet1/1-28, Ethernet2/1-28, Ethernet3/1-28, Ethernet4/1-32
+    no shutdown
+  interface nve1
+    no shutdown
+  no ip pim isolate
+  sleep instance 1 1060
+  router ospf underlay
+    no isolate
+  interface port-channel11-12, port-channel21-22
+    no shutdown
+  sleep instance 2 1120
+  router bgp 65541
+    address-family l2vpn evpn
+      nexthop trigger-delay critical 1 non-critical 1
+configure maintenance profile maintenance-mode
+  interface nve1
+    shutdown
+  interface port-channel11-12, port-channel21-22
+    shutdown
+  interface Ethernet1/1-24, Ethernet2/1-24, Ethernet3/1-24
+    shutdown
+  ip pim isolate
+  router ospf underlay
+    isolate
+  sleep instance 1 10
+  router bgp 65541
+    address-family l2vpn evpn
+      no nexthop trigger-delay
+configure terminal
+system mode maintenance always-use-custom-profile
+system mode maintenance on-reload reset-reason HW_ERROR
+system mode maintenance on-reload reset-reason SVC_FAILURE
+system mode maintenance on-reload reset-reason KERN_FAILURE
+system mode maintenance on-reload reset-reason WDOG_TIMEOUT
+system mode maintenance on-reload reset-reason FATAL_ERROR
+system mode maintenance on-reload reset-reason LC_FAILURE
+system mode maintenance on-reload reset-reason MANUAL_RELOAD
+system mode maintenance on-reload reset-reason MAINTENANCE
+system mode maintenance on-reload reset-reason ANY_OTHER
+system mode maintenance snapshot-delay 0
+system mode maintenance maint-delay 0
+snmp-server source-interface traps mgmt0
+snmp-server user xxxxxxxx network-admin auth md5 xxxxxxxx priv xxxxxxxx  localizedkey
+snmp-server user xxxxxxxx network-admin auth sha xxxxxxxx  localizedkey
+snmp-server user xxxxxxxx network-operator auth sha xxxxxxxx  localizedkey
+snmp-server user xxxxxxxx network-operator auth sha xxxxxxxx  localizedkey
+snmp-server user xxxxxxxx network-operator auth sha xxxxxxxx  localizedkey
+snmp-server user xxxxxxxx use-ipv4acl ACL_PROTECT_SNMP
+snmp-server user xxxxxxxx use-ipv4acl ACL_PROTECT_SNMP
+snmp-server user xxxxxxxx use-ipv4acl ACL_PROTECT_SNMP
+snmp-server user xxxxxxxx use-ipv4acl ACL_PROTECT_SNMP
+snmp-server user xxxxxxxx use-ipv4acl ACL_PROTECT_SNMP
+snmp-server host 10.47.65.201 traps version 3 auth xxxxxxxx 
+snmp-server host 10.47.65.201 use-vrf management
+snmp-server host 10.47.65.202 traps version 3 auth xxxxxxxx 
+snmp-server host 10.47.65.202 use-vrf management
+snmp-server host 10.47.65.135 traps version 3 auth xxxxxxxx 
+snmp-server host 10.47.65.135 use-vrf management
+snmp-server host 10.47.65.136 traps version 3 auth xxxxxxxx 
+snmp-server host 10.47.65.136 use-vrf management
+rmon event 1 description FATAL(1) owner PMON@FATAL
+rmon event 2 description CRITICAL(2) owner PMON@CRITICAL
+rmon event 3 description ERROR(3) owner PMON@ERROR
+rmon event 4 description WARNING(4) owner PMON@WARNING
+rmon event 5 description INFORMATION(5) owner PMON@INFO
+snmp-server enable traps callhome event-notify
+snmp-server enable traps callhome smtp-send-fail
+snmp-server enable traps cfs state-change-notif
+snmp-server enable traps lldp lldpRemTablesChange
+snmp-server enable traps cfs merge-failure
+snmp-server enable traps aaa server-state-change
+snmp-server enable traps feature-control FeatureOpStatusChange
+snmp-server enable traps sysmgr cseFailSwCoreNotifyExtended
+snmp-server enable traps config ccmCLIRunningConfigChanged
+snmp-server enable traps snmp authentication
+snmp-server enable traps link cisco-xcvr-mon-status-chg
+snmp-server enable traps vtp notifs
+snmp-server enable traps vtp vlancreate
+snmp-server enable traps vtp vlandelete
+snmp-server enable traps bridge newroot
+snmp-server enable traps bridge topologychange
+snmp-server enable traps stpx inconsistency
+snmp-server enable traps stpx root-inconsistency
+snmp-server enable traps stpx loop-inconsistency
+snmp-server enable traps system Clock-change-notification
+snmp-server enable traps feature-control ciscoFeatOpStatusChange
+snmp-server enable traps mmode cseNormalModeChangeNotify
+snmp-server enable traps mmode cseMaintModeChangeNotify
+snmp-server counter cache timeout 10
+ntp server 10.47.65.140 use-vrf management
+ntp server 10.47.65.145 prefer use-vrf management
+ntp server 10.47.65.149 use-vrf management
+ntp server 10.47.65.207 use-vrf management
+ntp source-interface mgmt0
+ntp logging
+ntp access-group peer ACL_PROTECT_NTP
+aaa authentication login default group TACACSANYCAST local 
+aaa authentication login console group TACACSANYCAST local 
+aaa authorization config-commands default group TACACSANYCAST local 
+aaa authorization commands default group TACACSANYCAST local 
+aaa authorization config-commands console group TACACSANYCAST local 
+aaa authorization commands console group TACACSANYCAST local 
+aaa accounting default group TACACSANYCAST local 
+aaa authentication login error-enable 
+aaa authentication login ascii-authentication 
+tacacs-server directed-request 
+aaa bypass-user olvs accounting authorization  
+
+fabric forwarding anycast-gateway-mac 0000.5e00.0102
+no ip source-route
+ip pim rp-address 172.17.119.41 group-list 224.0.0.0/4
+ip pim ssm range 232.0.0.0/8
+ip pim anycast-rp 172.17.119.41 172.17.119.93
+ip pim anycast-rp 172.17.119.41 172.17.119.94
+ip pim anycast-rp 172.17.119.41 172.17.119.95
+ip pim anycast-rp 172.17.119.41 172.17.119.96
+ip pim bfd
+system vlan long-name
+system vlan nve-overlay id 2178,2187-2189
+vlan 1,14-27,219-226,2097-2098,2100,2163-2174,2178,2187-2189,2515,3502,3699,3901-3934,3947,3951-3953,3957-3958,3961
+vlan 14
+  name eDZ_10.56.48.0/27_C00970844
+  vn-segment 2040014
+vlan 15
+  name eDZ_10.56.50.0/27_C00970844
+  vn-segment 2040015
+vlan 16
+  name eDZ_10.56.52.0/27_C00970844
+  vn-segment 2040016
+vlan 17
+  name eDZ_10.56.54.0/27_C00970844
+  vn-segment 2040017
+vlan 18
+  name eDZ_10.56.48.32/27_C00970844
+  vn-segment 2040018
+vlan 19
+  name eDZ_10.56.50.32/27_C00970844
+  vn-segment 2040019
+vlan 20
+  name eDZ_10.56.52.32/27_C00970844
+  vn-segment 2040020
+vlan 21
+  name eDZ_10.56.54.32/27_C00970844
+  vn-segment 2040021
+vlan 22
+  name eDZ_10.53.56.0/24_C00970844
+  vn-segment 2040022
+vlan 23
+  name eDZ_10.53.57.0/24_C00970844
+  vn-segment 2040023
+vlan 24
+  name eDZ_10.53.58.0/24_C00970844
+  vn-segment 2040024
+vlan 25
+  name eDZ_10.53.59.0/24_C00970844
+  vn-segment 2040025
+vlan 26
+  name eDZ_10.53.60.0/24_C00970844
+  vn-segment 2040026
+vlan 27
+  name eDZ_10.53.61.0/24_C00970844
+  vn-segment 2040027
+vlan 219
+  name e24_10.58.19.192/28_C02067190
+  vn-segment 2240219
+vlan 220
+  name e24Z_10.58.20.192/28_C02067190
+  vn-segment 2240220
+vlan 221
+  name e24Z_10.58.22.192/28_C02067190
+  vn-segment 2240221
+vlan 222
+  name e24Z_10.58.24.192/28_C02067190
+  vn-segment 2240222
+vlan 223
+  name e24Z_10.58.19.208/28_C02067190
+  vn-segment 2240223
+vlan 224
+  name e24Z_10.58.21.192/26_C02067190
+  vn-segment 2240224
+vlan 225
+  name e24Z_10.58.22.208/28_C02067190
+  vn-segment 2240225
+vlan 226
+  name e24Z_10.58.24.208/28_C02067190
+  vn-segment 2240226
+vlan 2097
+  name eDZ_10.56.6.0/28
+  vn-segment 2042097
+vlan 2098
+  name eDZ_10.56.6.16/28
+  vn-segment 2042098
+vlan 2100
+  name eDZ_10.56.6.32/28
+  vn-segment 2042100
+vlan 2163
+  name VRF_eMGRZ-TAUOUT
+  vn-segment 2630000
+vlan 2164
+  name VRF_eMGRZ-SIGMA
+  vn-segment 2640000
+vlan 2165
+  name VRF_eTZ-TECH
+  vn-segment 2650000
+vlan 2166
+  name VRF_eTZ-GATE
+  vn-segment 2660000
+vlan 2167
+  name VRF_eTZ-FPSU-TLS
+  vn-segment 2670000
+vlan 2168
+  name VRF_eTZ-FPSU-eDigital
+  vn-segment 2680000
+vlan 2169
+  name VRF_eTZ-FPSU-SBT
+  vn-segment 2690000
+vlan 2170
+  name VRF_eTZ-FPSU-VDI
+  vn-segment 2700000
+vlan 2171
+  name VRF_eTZ-VPN-EXT-ORG
+  vn-segment 2710000
+vlan 2172
+  name VRF_eTZ-FPSU-OTHER
+  vn-segment 2720000
+vlan 2173
+  name VRF_eTZ-SUBS
+  vn-segment 2730000
+vlan 2174
+  name VRF_eTZ-FPSU-MGMT
+  vn-segment 2740000
+vlan 2178
+  name VRF_eTZ-ENSYS-OUT
+  vn-segment 2780000
+vlan 2187
+  name VRF_ENSYS-SERVICE
+  vn-segment 2870000
+vlan 2188
+  name VRF_ENSYS-MGMT
+  vn-segment 2880000
+vlan 2189
+  name VRF_ENSYS-DMZ
+  vn-segment 2890000
+vlan 2515
+  name eMZ_10.35.128.0/23
+  vn-segment 2032515
+vlan 3502
+  name eMZ_10.35.202.0/23_C01166437
+  vn-segment 9033502
+vlan 3699
+  name FF_10.42.5.104/30_C01166437
+  vn-segment 8993699
+vlan 3901
+  name VRF_eAZ
+  vn-segment 2010000
+vlan 3902
+  name VRF_eFZ
+  vn-segment 2020000
+vlan 3903
+  name VRF_eMZ
+  vn-segment 2030000
+vlan 3904
+  name VRF_eDZ
+  vn-segment 2040000
+vlan 3905
+  name VRF_ePZ
+  vn-segment 2050000
+vlan 3906
+  name VRF_eUZ
+  vn-segment 2060000
+vlan 3907
+  name VRF_eBZ
+  vn-segment 2070000
+vlan 3908
+  name VRF_e08Z
+  vn-segment 2080000
+vlan 3909
+  name VRF_e09Z
+  vn-segment 2090000
+vlan 3910
+  name VRF_e10Z
+  vn-segment 2100000
+vlan 3911
+  name VRF_e11Z
+  vn-segment 2110000
+vlan 3912
+  name VRF_e12Z
+  vn-segment 2120000
+vlan 3913
+  name VRF_e13Z
+  vn-segment 2130000
+vlan 3914
+  name VRF_e14Z
+  vn-segment 2140000
+vlan 3915
+  name VRF_e15Z
+  vn-segment 2150000
+vlan 3916
+  name VRF_e16Z
+  vn-segment 2160000
+vlan 3917
+  name VRF_e17Z
+  vn-segment 2170000
+vlan 3918
+  name VRF_e18Z
+  vn-segment 2180000
+vlan 3919
+  name VRF_e19Z
+  vn-segment 2190000
+vlan 3920
+  name VRF_e20Z
+  vn-segment 2200000
+vlan 3921
+  name VRF_e21Z
+  vn-segment 2210000
+vlan 3922
+  name VRF_e22Z
+  vn-segment 2220000
+vlan 3923
+  name VRF_e23Z
+  vn-segment 2230000
+vlan 3924
+  name VRF_e24Z
+  vn-segment 2240000
+vlan 3925
+  name VRF_e25Z
+  vn-segment 2250000
+vlan 3926
+  name VRF_e26Z
+  vn-segment 2260000
+vlan 3927
+  name VRF_e27Z
+  vn-segment 2270000
+vlan 3928
+  name VRF_e28Z
+  vn-segment 2280000
+vlan 3929
+  name VRF_e29Z
+  vn-segment 2290000
+vlan 3930
+  name VRF_e30Z
+  vn-segment 2300000
+vlan 3931
+  name VRF_e31Z
+  vn-segment 2310000
+vlan 3932
+  name VRF_e32Z
+  vn-segment 2320000
+vlan 3933
+  name VRF_e33Z
+  vn-segment 2330000
+vlan 3934
+  name VRF_e34Z
+  vn-segment 2340000
+vlan 3947
+  name VRF_e47Z
+  vn-segment 2470000
+vlan 3951
+  name VRF_e51Z
+  vn-segment 2510000
+vlan 3952
+  name VRF_e52Z
+  vn-segment 2520000
+vlan 3953
+  name VRF_e53Z
+  vn-segment 2530000
+vlan 3957
+  name VRF_e57Z
+  vn-segment 2570000
+vlan 3958
+  name VRF_e58Z
+  vn-segment 2580000
+vlan 3961
+  name VRF_e61Z
+  vn-segment 2610000
+
+cdp format device-id system-name
+route-map NEXT-HOP-UNCHANGED permit 10
+  set ip next-hop unchanged
+route-map RM-REDIST-DIRECT-ENSYS-DMZ permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-ENSYS-MGMT permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-ENSYS-SERVICE permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e08Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e09Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e10Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e11Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e12Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e13Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e14Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e15Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e16Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e17Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e18Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e19Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e20Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e21Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e22Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e23Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e24Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e25Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e26Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e27Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e28Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e29Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e30Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e31Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e32Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e33Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e34Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e47Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e51Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e52Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e53Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e57Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e58Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-e61Z permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eAZ permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eBZ permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eDZ permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eFZ permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eMGRZ-SIGMA permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eMGRZ-TAUOUT permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eMZ permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-ePZ permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-ENSYS-OUT permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-FPSU-MGMT permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-FPSU-OTHER permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-FPSU-SBT permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-FPSU-TLS permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-FPSU-VDI permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-FPSU-eDigital permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-GATE permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-SUBS permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-TECH permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eTZ-VPN-EXT-ORG permit 10
+  match tag 62000 
+route-map RM-REDIST-DIRECT-eUZ permit 10
+  match tag 62000 
+route-map RMAP-REDIST-DIRECT permit 10
+  match tag 65541 
+vrf context ENSYS-DMZ
+  vni 2890000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2890000
+    route-target import 62000:2890000 evpn
+    route-target export 62000:2890000
+    route-target export 62000:2890000 evpn
+vrf context ENSYS-MGMT
+  vni 2880000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2880000
+    route-target import 62000:2880000 evpn
+    route-target export 62000:2880000
+    route-target export 62000:2880000 evpn
+vrf context ENSYS-SERVICE
+  vni 2870000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2870000
+    route-target import 62000:2870000 evpn
+    route-target export 62000:2870000
+    route-target export 62000:2870000 evpn
+vrf context e08Z
+  description VRF_e08Z
+  vni 2080000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2080000
+    route-target import 62000:2080000 evpn
+    route-target export 62000:2080000
+    route-target export 62000:2080000 evpn
+vrf context e09Z
+  description VRF_e09Z
+  vni 2090000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2090000
+    route-target import 62000:2090000 evpn
+    route-target export 62000:2090000
+    route-target export 62000:2090000 evpn
+vrf context e10Z
+  description VRF_e10Z
+  vni 2100000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2100000
+    route-target import 62000:2100000 evpn
+    route-target export 62000:2100000
+    route-target export 62000:2100000 evpn
+vrf context e11Z
+  description VRF_e11Z
+  vni 2110000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2110000
+    route-target import 62000:2110000 evpn
+    route-target export 62000:2110000
+    route-target export 62000:2110000 evpn
+vrf context e12Z
+  description VRF_e12Z
+  vni 2120000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2120000
+    route-target import 62000:2120000 evpn
+    route-target export 62000:2120000
+    route-target export 62000:2120000 evpn
+vrf context e13Z
+  description VRF_e13Z
+  vni 2130000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2130000
+    route-target import 62000:2130000 evpn
+    route-target export 62000:2130000
+    route-target export 62000:2130000 evpn
+vrf context e14Z
+  description VRF_e14Z
+  vni 2140000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2140000
+    route-target import 62000:2140000 evpn
+    route-target export 62000:2140000
+    route-target export 62000:2140000 evpn
+vrf context e15Z
+  description VRF_e15Z
+  vni 2150000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2150000
+    route-target import 62000:2150000 evpn
+    route-target export 62000:2150000
+    route-target export 62000:2150000 evpn
+vrf context e16Z
+  description VRF_e16Z
+  vni 2160000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2160000
+    route-target import 62000:2160000 evpn
+    route-target export 62000:2160000
+    route-target export 62000:2160000 evpn
+vrf context e17Z
+  description VRF_e17Z
+  vni 2170000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2170000
+    route-target import 62000:2170000 evpn
+    route-target export 62000:2170000
+    route-target export 62000:2170000 evpn
+vrf context e18Z
+  description VRF_e18Z
+  vni 2180000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2180000
+    route-target import 62000:2180000 evpn
+    route-target export 62000:2180000
+    route-target export 62000:2180000 evpn
+vrf context e19Z
+  description VRF_e19Z
+  vni 2190000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2190000
+    route-target import 62000:2190000 evpn
+    route-target export 62000:2190000
+    route-target export 62000:2190000 evpn
+vrf context e20Z
+  description VRF_e20Z
+  vni 2200000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2200000
+    route-target import 62000:2200000 evpn
+    route-target export 62000:2200000
+    route-target export 62000:2200000 evpn
+vrf context e21Z
+  description VRF_e21Z
+  vni 2210000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2210000
+    route-target import 62000:2210000 evpn
+    route-target export 62000:2210000
+    route-target export 62000:2210000 evpn
+vrf context e22Z
+  description VRF_e22Z
+  vni 2220000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2220000
+    route-target import 62000:2220000 evpn
+    route-target export 62000:2220000
+    route-target export 62000:2220000 evpn
+vrf context e23Z
+  description VRF_e23Z
+  vni 2230000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2230000
+    route-target import 62000:2230000 evpn
+    route-target export 62000:2230000
+    route-target export 62000:2230000 evpn
+vrf context e24Z
+  description VRF_e24Z
+  vni 2240000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2240000
+    route-target import 62000:2240000 evpn
+    route-target export 62000:2240000
+    route-target export 62000:2240000 evpn
+vrf context e25Z
+  description VRF_e25Z
+  vni 2250000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2250000
+    route-target import 62000:2250000 evpn
+    route-target export 62000:2250000
+    route-target export 62000:2250000 evpn
+vrf context e26Z
+  description VRF_e26Z
+  vni 2260000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2260000
+    route-target import 62000:2260000 evpn
+    route-target export 62000:2260000
+    route-target export 62000:2260000 evpn
+vrf context e27Z
+  description VRF_e27Z
+  vni 2270000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2270000
+    route-target import 62000:2270000 evpn
+    route-target export 62000:2270000
+    route-target export 62000:2270000 evpn
+vrf context e28Z
+  description VRF_e28Z
+  vni 2280000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2280000
+    route-target import 62000:2280000 evpn
+    route-target export 62000:2280000
+    route-target export 62000:2280000 evpn
+vrf context e29Z
+  description VRF_e29Z
+  vni 2290000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2290000
+    route-target import 62000:2290000 evpn
+    route-target export 62000:2290000
+    route-target export 62000:2290000 evpn
+vrf context e30Z
+  description VRF_e30Z
+  vni 2300000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2300000
+    route-target import 62000:2300000 evpn
+    route-target export 62000:2300000
+    route-target export 62000:2300000 evpn
+vrf context e31Z
+  description VRF_e31Z
+  vni 2310000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2310000
+    route-target import 62000:2310000 evpn
+    route-target export 62000:2310000
+    route-target export 62000:2310000 evpn
+vrf context e32Z
+  description VRF_e32Z
+  vni 2320000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2320000
+    route-target import 62000:2320000 evpn
+    route-target export 62000:2320000
+    route-target export 62000:2320000 evpn
+vrf context e33Z
+  description VRF_e33Z
+  vni 2330000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2330000
+    route-target import 62000:2330000 evpn
+    route-target export 62000:2330000
+    route-target export 62000:2330000 evpn
+vrf context e34Z
+  description VRF_e34Z
+  vni 2340000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2340000
+    route-target import 62000:2340000 evpn
+    route-target export 62000:2340000
+    route-target export 62000:2340000 evpn
+vrf context e47Z
+  description VRF_e47Z
+  vni 2470000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2470000
+    route-target import 62000:2470000 evpn
+    route-target export 62000:2470000
+    route-target export 62000:2470000 evpn
+vrf context e51Z
+  description VRF_e51Z
+  vni 2510000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2510000
+    route-target import 62000:2510000 evpn
+    route-target export 62000:2510000
+    route-target export 62000:2510000 evpn
+vrf context e52Z
+  description VRF_e52Z
+  vni 2520000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2520000
+    route-target import 62000:2520000 evpn
+    route-target export 62000:2520000
+    route-target export 62000:2520000 evpn
+vrf context e53Z
+  description VRF_e53Z
+  vni 2530000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2530000
+    route-target import 62000:2530000 evpn
+    route-target export 62000:2530000
+    route-target export 62000:2530000 evpn
+vrf context e57Z
+  description VRF_e57Z
+  vni 2570000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2570000
+    route-target import 62000:2570000 evpn
+    route-target export 62000:2570000
+    route-target export 62000:2570000 evpn
+vrf context e58Z
+  description VRF_e58Z
+  vni 2580000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2580000
+    route-target import 62000:2580000 evpn
+    route-target export 62000:2580000
+    route-target export 62000:2580000 evpn
+vrf context e61Z
+  description VRF_e61Z
+  vni 2610000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2610000
+    route-target import 62000:2610000 evpn
+    route-target export 62000:2610000
+    route-target export 62000:2610000 evpn
+vrf context eAZ
+  description VRF_eAZ
+  vni 2010000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2010000
+    route-target import 62000:2010000 evpn
+    route-target export 62000:2010000
+    route-target export 62000:2010000 evpn
+vrf context eBZ
+  description VRF_eBZ
+  vni 2070000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2070000
+    route-target import 62000:2070000 evpn
+    route-target export 62000:2070000
+    route-target export 62000:2070000 evpn
+vrf context eDZ
+  description VRF_eDZ
+  vni 2040000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2040000
+    route-target import 62000:2040000 evpn
+    route-target export 62000:2040000
+    route-target export 62000:2040000 evpn
+vrf context eFZ
+  description VRF_eFZ
+  vni 2020000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2020000
+    route-target import 62000:2020000 evpn
+    route-target export 62000:2020000
+    route-target export 62000:2020000 evpn
+vrf context eMGRZ-SIGMA
+  description VRF_eMGRZ-SIGMA
+  vni 2640000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2640000
+    route-target import 62000:2640000 evpn
+    route-target export 62000:2640000
+    route-target export 62000:2640000 evpn
+vrf context eMGRZ-TAUOUT
+  description VRF_eMGRZ-TAUOUT
+  vni 2630000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2630000
+    route-target import 62000:2630000 evpn
+    route-target export 62000:2630000
+    route-target export 62000:2630000 evpn
+vrf context eMZ
+  description VRF_eMZ
+  vni 2030000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2030000
+    route-target import 62000:2030000 evpn
+    route-target export 62000:2030000
+    route-target export 62000:2030000 evpn
+vrf context ePZ
+  description VRF_ePZ
+  vni 2050000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2050000
+    route-target import 62000:2050000 evpn
+    route-target export 62000:2050000
+    route-target export 62000:2050000 evpn
+vrf context eTZ-ENSYS-OUT
+  vni 2780000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2780000
+    route-target import 62000:2780000 evpn
+    route-target export 62000:2780000
+    route-target export 62000:2780000 evpn
+vrf context eTZ-FPSU-MGMT
+  description VRF_eTZ-FPSU-MGMT
+  vni 2740000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2740000
+    route-target import 62000:2740000 evpn
+    route-target export 62000:2740000
+    route-target export 62000:2740000 evpn
+vrf context eTZ-FPSU-OTHER
+  description VRF_eTZ-FPSU-OTHER
+  vni 2720000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2720000
+    route-target import 62000:2720000 evpn
+    route-target export 62000:2720000
+    route-target export 62000:2720000 evpn
+vrf context eTZ-FPSU-SBT
+  description VRF_eTZ-FPSU-SBT
+  vni 2690000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2690000
+    route-target import 62000:2690000 evpn
+    route-target export 62000:2690000
+    route-target export 62000:2690000 evpn
+vrf context eTZ-FPSU-TLS
+  description VRF_eTZ-FPSU-TLS
+  vni 2670000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2670000
+    route-target import 62000:2670000 evpn
+    route-target export 62000:2670000
+    route-target export 62000:2670000 evpn
+vrf context eTZ-FPSU-VDI
+  description VRF_eTZ-FPSU-VDI
+  vni 2700000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2700000
+    route-target import 62000:2700000 evpn
+    route-target export 62000:2700000
+    route-target export 62000:2700000 evpn
+vrf context eTZ-FPSU-eDigital
+  description VRF_eTZ-FPSU-eDigital
+  vni 2680000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2680000
+    route-target import 62000:2680000 evpn
+    route-target export 62000:2680000
+    route-target export 62000:2680000 evpn
+vrf context eTZ-GATE
+  description VRF_eTZ-GATE
+  vni 2660000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2660000
+    route-target import 62000:2660000 evpn
+    route-target export 62000:2660000
+    route-target export 62000:2660000 evpn
+vrf context eTZ-SUBS
+  description VRF_eTZ-SUBS
+  vni 2730000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2730000
+    route-target import 62000:2730000 evpn
+    route-target export 62000:2730000
+    route-target export 62000:2730000 evpn
+vrf context eTZ-TECH
+  description VRF_eTZ-TECH
+  vni 2650000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2650000
+    route-target import 62000:2650000 evpn
+    route-target export 62000:2650000
+    route-target export 62000:2650000 evpn
+vrf context eTZ-VPN-EXT-ORG
+  description VRF_eTZ-VPN-EXT-ORG
+  vni 2710000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2710000
+    route-target import 62000:2710000 evpn
+    route-target export 62000:2710000
+    route-target export 62000:2710000 evpn
+vrf context eUZ
+  description VRF_eUZ
+  vni 2060000
+  rd auto
+  address-family ipv4 unicast
+    route-target import 62000:2060000
+    route-target import 62000:2060000 evpn
+    route-target export 62000:2060000
+    route-target export 62000:2060000 evpn
+vrf context management
+  ip name-server 10.119.248.20
+  ip route 0.0.0.0/0 10.43.131.126
+hardware access-list tcam region ing-netflow 0
+no system module failure-action shutdown multibit-parity
+
+nxapi use-vrf management
+
+
+interface Vlan1
+
+interface Vlan2163
+  description VRF_eMGRZ-TAUOUT
+  no shutdown
+  mtu 9216
+  vrf member eMGRZ-TAUOUT
+  ip forward
+
+interface Vlan2164
+  description VRF_eMGRZ-SIGMA
+  no shutdown
+  mtu 9216
+  vrf member eMGRZ-SIGMA
+  ip forward
+
+interface Vlan2165
+  description VRF_eTZ-TECH
+  no shutdown
+  mtu 9216
+  vrf member eTZ-TECH
+  ip forward
+
+interface Vlan2166
+  description VRF_eTZ-GATE
+  no shutdown
+  mtu 9216
+  vrf member eTZ-GATE
+  ip forward
+
+interface Vlan2167
+  description VRF_eTZ-FPSU-TLS
+  no shutdown
+  mtu 9216
+  vrf member eTZ-FPSU-TLS
+  ip forward
+
+interface Vlan2168
+  description VRF_eTZ-FPSU-eDigital
+  no shutdown
+  mtu 9216
+  vrf member eTZ-FPSU-eDigital
+  ip forward
+
+interface Vlan2169
+  description VRF_eTZ-FPSU-SBT
+  no shutdown
+  mtu 9216
+  vrf member eTZ-FPSU-SBT
+  ip forward
+
+interface Vlan2170
+  description VRF_eTZ-FPSU-VDI
+  no shutdown
+  mtu 9216
+  vrf member eTZ-FPSU-VDI
+  ip forward
+
+interface Vlan2171
+  description VRF_eTZ-VPN-EXT-ORG
+  no shutdown
+  mtu 9216
+  vrf member eTZ-VPN-EXT-ORG
+  ip forward
+
+interface Vlan2172
+  description VRF_eTZ-FPSU-OTHER
+  no shutdown
+  mtu 9216
+  vrf member eTZ-FPSU-OTHER
+  ip forward
+
+interface Vlan2173
+  description VRF_eTZ-SUBS
+  no shutdown
+  mtu 9216
+  vrf member eTZ-SUBS
+  ip forward
+
+interface Vlan2174
+  description VRF_eTZ-FPSU-MGMT
+  no shutdown
+  mtu 9216
+  vrf member eTZ-FPSU-MGMT
+  ip forward
+
+interface Vlan2178
+  description L3_VNI_FOR_eTZ-ENSYS-OUT_2780000
+  no shutdown
+  mtu 9216
+  vrf member eTZ-ENSYS-OUT
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan2187
+  description L3_VNI_FOR_ENSYS-SERVICE_2870000
+  no shutdown
+  mtu 9216
+  vrf member ENSYS-SERVICE
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan2188
+  description L3_VNI_FOR_EENSYS-MGMT_2880000
+  no shutdown
+  mtu 9216
+  vrf member ENSYS-MGMT
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan2189
+  description L3_VNI_FOR_ENSYS-DMZ_2890000
+  no shutdown
+  mtu 9216
+  vrf member ENSYS-DMZ
+  no ip redirects
+  ip forward
+  no ipv6 redirects
+
+interface Vlan3901
+  description VRF_eAZ
+  no shutdown
+  mtu 9216
+  vrf member eAZ
+  ip forward
+
+interface Vlan3902
+  description VRF_eFZ
+  no shutdown
+  mtu 9216
+  vrf member eFZ
+  ip forward
+
+interface Vlan3903
+  description VRF_eMZ
+  no shutdown
+  mtu 9216
+  vrf member eMZ
+  ip forward
+
+interface Vlan3904
+  description VRF_eDZ
+  no shutdown
+  mtu 9216
+  vrf member eDZ
+  ip forward
+
+interface Vlan3905
+  description VRF_ePZ
+  no shutdown
+  mtu 9216
+  vrf member ePZ
+  ip forward
+
+interface Vlan3906
+  description VRF_eUZ
+  no shutdown
+  mtu 9216
+  vrf member eUZ
+  ip forward
+
+interface Vlan3907
+  description VRF_eBZ
+  no shutdown
+  mtu 9216
+  vrf member eBZ
+  ip forward
+
+interface Vlan3908
+  description VRF_e08Z
+  no shutdown
+  mtu 9216
+  vrf member e08Z
+  ip forward
+
+interface Vlan3909
+  description VRF_e09Z
+  no shutdown
+  mtu 9216
+  vrf member e09Z
+  ip forward
+
+interface Vlan3910
+  description VRF_e10Z
+  no shutdown
+  mtu 9216
+  vrf member e10Z
+  ip forward
+
+interface Vlan3911
+  description VRF_e11Z
+  no shutdown
+  mtu 9216
+  vrf member e11Z
+  ip forward
+
+interface Vlan3912
+  description VRF_e12Z
+  no shutdown
+  mtu 9216
+  vrf member e12Z
+  ip forward
+
+interface Vlan3913
+  description VRF_e13Z
+  no shutdown
+  mtu 9216
+  vrf member e13Z
+  ip forward
+
+interface Vlan3914
+  description VRF_e14Z
+  no shutdown
+  mtu 9216
+  vrf member e14Z
+  ip forward
+
+interface Vlan3915
+  description VRF_e15Z
+  no shutdown
+  mtu 9216
+  vrf member e15Z
+  ip forward
+
+interface Vlan3916
+  description VRF_e16Z
+  no shutdown
+  mtu 9216
+  vrf member e16Z
+  ip forward
+
+interface Vlan3917
+  description VRF_e17Z
+  no shutdown
+  mtu 9216
+  vrf member e17Z
+  ip forward
+
+interface Vlan3918
+  description VRF_e18Z
+  no shutdown
+  mtu 9216
+  vrf member e18Z
+  ip forward
+
+interface Vlan3919
+  description VRF_e19Z
+  no shutdown
+  mtu 9216
+  vrf member e19Z
+  ip forward
+
+interface Vlan3920
+  description VRF_e20Z
+  no shutdown
+  mtu 9216
+  vrf member e20Z
+  ip forward
+
+interface Vlan3921
+  description VRF_e21Z
+  no shutdown
+  mtu 9216
+  vrf member e21Z
+  ip forward
+
+interface Vlan3922
+  description VRF_e22Z
+  no shutdown
+  mtu 9216
+  vrf member e22Z
+  ip forward
+
+interface Vlan3923
+  description VRF_e23Z
+  no shutdown
+  mtu 9216
+  vrf member e23Z
+  ip forward
+
+interface Vlan3924
+  description VRF_e24Z
+  no shutdown
+  mtu 9216
+  vrf member e24Z
+  ip forward
+
+interface Vlan3925
+  description VRF_e25Z
+  no shutdown
+  mtu 9216
+  vrf member e25Z
+  ip forward
+
+interface Vlan3926
+  description VRF_e26Z
+  no shutdown
+  mtu 9216
+  vrf member e26Z
+  ip forward
+
+interface Vlan3927
+  description VRF_e27Z
+  no shutdown
+  mtu 9216
+  vrf member e27Z
+  ip forward
+
+interface Vlan3928
+  description VRF_e28Z
+  no shutdown
+  mtu 9216
+  vrf member e28Z
+  ip forward
+
+interface Vlan3929
+  description VRF_e29Z
+  no shutdown
+  mtu 9216
+  vrf member e29Z
+  ip forward
+
+interface Vlan3930
+  description VRF_e30Z
+  no shutdown
+  mtu 9216
+  vrf member e30Z
+  ip forward
+
+interface Vlan3931
+  description VRF_e31Z
+  no shutdown
+  mtu 9216
+  vrf member e31Z
+  ip forward
+
+interface Vlan3932
+  description VRF_e32Z
+  no shutdown
+  mtu 9216
+  vrf member e32Z
+  ip forward
+
+interface Vlan3933
+  description VRF_e33Z
+  no shutdown
+  mtu 9216
+  vrf member e33Z
+  ip forward
+
+interface Vlan3934
+  description VRF_e34Z
+  no shutdown
+  mtu 9216
+  vrf member e34Z
+  ip forward
+
+interface Vlan3947
+  description VRF_e47Z
+  no shutdown
+  mtu 9216
+  vrf member e47Z
+  ip forward
+
+interface Vlan3951
+  description VRF_e51Z
+  no shutdown
+  mtu 9216
+  vrf member e51Z
+  ip forward
+
+interface Vlan3952
+  description VRF_e52Z
+  no shutdown
+  mtu 9216
+  vrf member e52Z
+  ip forward
+
+interface Vlan3953
+  description VRF_e53Z
+  no shutdown
+  mtu 9216
+  vrf member e53Z
+  ip forward
+
+interface Vlan3957
+  description VRF_e57Z
+  no shutdown
+  mtu 9216
+  vrf member e57Z
+  ip forward
+
+interface Vlan3958
+  description VRF_e58Z
+  no shutdown
+  mtu 9216
+  vrf member e58Z
+  ip forward
+
+interface Vlan3961
+  description VRF_e61Z
+  no shutdown
+  mtu 9216
+  vrf member e61Z
+  ip forward
+
+interface port-channel11
+  description ---NSS_SKO-DATA-SS-MD1-N04-01-EXT_port-channel1412
+  mtu 9216
+  bfd interval 50 min_rx 50 multiplier 5
+  bfd per-link
+  no ip redirects
+  ip address 172.17.114.73/31 tag 65541
+  no ipv6 redirects
+  evpn multisite dci-tracking
+
+interface port-channel12
+  description ---NSS_SKO-DATA-SS-MD1-N04-02-EXT_port-channel1412
+  mtu 9216
+  bfd interval 50 min_rx 50 multiplier 5
+  bfd per-link
+  no ip redirects
+  ip address 172.17.114.75/31 tag 65541
+  no ipv6 redirects
+  evpn multisite dci-tracking
+
+interface port-channel21
+  description ---NSS_SKO-DATA-SS-MD2-N04-01-EXT_port-channel1412
+  mtu 9216
+  bfd interval 50 min_rx 50 multiplier 5
+  bfd per-link
+  no ip redirects
+  ip address 172.17.114.77/31 tag 65541
+  no ipv6 redirects
+  evpn multisite dci-tracking
+
+interface port-channel22
+  description ---NSS_SKO-DATA-SS-MD2-N04-02-EXT_port-channel1412
+  mtu 9216
+  bfd interval 50 min_rx 50 multiplier 5
+  bfd per-link
+  no ip redirects
+  ip address 172.17.114.79/31 tag 65541
+  no ipv6 redirects
+  evpn multisite dci-tracking
+
+interface nve1
+  no shutdown
+  description VTEP
+  host-reachability protocol bgp
+  source-interface loopback1
+  source-interface hold-down-time 500
+  multisite border-gateway interface loopback100
+  member vni 2010000 associate-vrf
+  member vni 2020000 associate-vrf
+  member vni 2030000 associate-vrf
+  member vni 2032515
+    mcast-group 225.1.0.3
+  member vni 2040000 associate-vrf
+  member vni 2040014
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040015
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040016
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040017
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040018
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040019
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040020
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040021
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040022
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040023
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040024
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040025
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040026
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2040027
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2042097
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2042098
+    multisite ingress-replication
+    mcast-group 225.1.0.4
+  member vni 2042100
+    mcast-group 225.1.0.4
+  member vni 2050000 associate-vrf
+  member vni 2060000 associate-vrf
+  member vni 2070000 associate-vrf
+  member vni 2080000 associate-vrf
+  member vni 2090000 associate-vrf
+  member vni 2100000 associate-vrf
+  member vni 2110000 associate-vrf
+  member vni 2120000 associate-vrf
+  member vni 2130000 associate-vrf
+  member vni 2140000 associate-vrf
+  member vni 2150000 associate-vrf
+  member vni 2160000 associate-vrf
+  member vni 2170000 associate-vrf
+  member vni 2180000 associate-vrf
+  member vni 2190000 associate-vrf
+  member vni 2200000 associate-vrf
+  member vni 2210000 associate-vrf
+  member vni 2220000 associate-vrf
+  member vni 2230000 associate-vrf
+  member vni 2240000 associate-vrf
+  member vni 2240219
+    multisite ingress-replication
+    ingress-replication protocol bgp
+  member vni 2240220
+    multisite ingress-replication
+    ingress-replication protocol bgp
+  member vni 2240221
+    multisite ingress-replication
+    ingress-replication protocol bgp
+  member vni 2240222
+    multisite ingress-replication
+    ingress-replication protocol bgp
+  member vni 2240223
+    multisite ingress-replication
+    ingress-replication protocol bgp
+  member vni 2240224
+    multisite ingress-replication
+    ingress-replication protocol bgp
+  member vni 2240225
+    multisite ingress-replication
+    ingress-replication protocol bgp
+  member vni 2240226
+    multisite ingress-replication
+    ingress-replication protocol bgp
+  member vni 2250000 associate-vrf
+  member vni 2260000 associate-vrf
+  member vni 2270000 associate-vrf
+  member vni 2280000 associate-vrf
+  member vni 2290000 associate-vrf
+  member vni 2300000 associate-vrf
+  member vni 2310000 associate-vrf
+  member vni 2320000 associate-vrf
+  member vni 2330000 associate-vrf
+  member vni 2340000 associate-vrf
+  member vni 2470000 associate-vrf
+  member vni 2510000 associate-vrf
+  member vni 2520000 associate-vrf
+  member vni 2530000 associate-vrf
+  member vni 2570000 associate-vrf
+  member vni 2580000 associate-vrf
+  member vni 2610000 associate-vrf
+  member vni 2630000 associate-vrf
+  member vni 2640000 associate-vrf
+  member vni 2650000 associate-vrf
+  member vni 2660000 associate-vrf
+  member vni 2670000 associate-vrf
+  member vni 2680000 associate-vrf
+  member vni 2690000 associate-vrf
+  member vni 2700000 associate-vrf
+  member vni 2710000 associate-vrf
+  member vni 2720000 associate-vrf
+  member vni 2730000 associate-vrf
+  member vni 2740000 associate-vrf
+  member vni 2780000 associate-vrf
+  member vni 2870000 associate-vrf
+  member vni 2880000 associate-vrf
+  member vni 2890000 associate-vrf
+  member vni 8993699
+    multisite ingress-replication
+    mcast-group 225.1.0.99
+  member vni 9033502
+    multisite ingress-replication
+    mcast-group 225.1.0.3
+
+interface Ethernet1/1
+  description ---NNL-SKO-DATA-AC-041-Q04-01-EXT_eth1/50_CI00736332
+  mtu 9216
+  ip address 172.17.124.2/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/2
+  description ---NNL-SKO-DATA-AC-041-D13-01-EXT_eth1/50_C00855992
+  mtu 9216
+  ip address 172.17.124.34/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/3
+  description ---NNL-SKO-DATA-AC-041-G13-01-EXT_eth1/50_C00822600
+  mtu 9216
+  ip address 172.17.124.66/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/4
+  description ---NNL-SKO-DATA-AC-041-F22-01-EXT_eth1/50_C00964449
+  mtu 9216
+  ip address 172.17.124.98/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/5
+  description ---NNL-SKO-DATA-AC-041-M18-01-EXT_eth1/50_C00964449
+  mtu 9216
+  ip address 172.17.124.130/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/6
+  description free_go_alpha_C01269388
+  mtu 9216
+  ip address 172.17.124.162/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/7
+  description ---NNS_SKO-DATA-AC-041-D22-01-EXT_Eth1/50_C00996671_ZNO0103071361
+  mtu 9216
+  ip address 172.17.124.194/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/8
+  description ---NNS_SKO-DATA-AC-041-M18-03-EXT_Eth1/50_C01199153
+  mtu 9216
+  ip address 172.17.124.226/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/9
+  description ---NNL-SKO-DATA-AC-041-E18-01-EXT_eth1/50_C01217135
+  mtu 9216
+  ip address 172.17.125.2/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/10
+  description ---NNS_SKO-DATA-AC-041-leaf037-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.34/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/11
+  description ---NNS_SKO-DATA-AC-041-leaf041-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.66/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/12
+  description ---NNS_SKO-DATA-AC-041-leaf045-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.98/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/13
+  description ---NNS_SKO-DATA-AC-041-leaf049-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.130/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/14
+  description ---NNS_SKO-DATA-AC-041-leaf053-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.162/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/15
+  description ---NNS_SKO-DATA-AC-041-leaf057-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.194/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/16
+  description ---NNL-SKO-DATA-AC-041-P09-01-EXT_eth1/50_C01330682
+  mtu 9216
+  ip address 172.17.125.226/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/17
+  description ---NNL-SKO-DATA-AC-041-F31-01-EXT_Eth1/50_C01552821
+  mtu 9216
+  ip address 172.18.10.2/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/18
+  description ---NNL-SKO-DATA-AC-041-leaf069-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.34/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/19
+  description ---NNL-SKO-DATA-AC-041-leaf073-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.66/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/20
+  description ---NNL-SKO-DATA-AC-041-leaf077-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.98/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/21
+  description ---NNL-SKO-DATA-AC-041-leaf081-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.130/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/22
+  description ---NNL-SKO-DATA-AC-041-leaf085-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.162/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/23
+  description ---NNL-SKO-DATA-AC-041-leaf089-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.194/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/24
+  description ---NNL-SKO-DATA-AC-041-leaf093-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.226/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet1/25
+  description unused_uplink
+  no shutdown
+
+interface Ethernet1/26
+  description unused_uplink
+  no shutdown
+
+interface Ethernet1/27
+  description unused_uplink
+  no shutdown
+
+interface Ethernet1/28
+  description unused_uplink
+  no shutdown
+
+interface Ethernet1/29
+  description ---NSS_SKO-DATA-SS-MD1-N04-01-EXT_Eth1/11
+  mtu 9216
+  channel-group 11 mode active
+  no shutdown
+
+interface Ethernet1/30
+  description ---NSS_SKO-DATA-SS-MD1-N04-02-EXT_Eth1/11
+  mtu 9216
+  channel-group 12 mode active
+  no shutdown
+
+interface Ethernet1/31
+  description ---NSS_SKO-DATA-SS-MD2-N04-01-EXT_Eth1/11
+  mtu 9216
+  channel-group 21 mode active
+  no shutdown
+
+interface Ethernet1/32
+  description ---NSS_SKO-DATA-SS-MD2-N04-02-EXT_Eth1/11
+  mtu 9216
+  channel-group 22 mode active
+  no shutdown
+
+interface Ethernet2/1
+  description ---NNL-SKO-DATA-AC-041-Q04-02-EXT_eth1/50_CI00736336
+  mtu 9216
+  ip address 172.17.124.10/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/2
+  description ---NNL-SKO-DATA-AC-041-E13-02-EXT_eth1/50_C00855992
+  mtu 9216
+  ip address 172.17.124.42/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/3
+  description ---NNL-SKO-DATA-AC-041-G13-02-EXT_eth1/50_C00822600
+  mtu 9216
+  ip address 172.17.124.74/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/4
+  description ---NNL-SKO-DATA-AC-041-F22-02-EXT_eth1/50_C00964449
+  mtu 9216
+  ip address 172.17.124.106/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/5
+  description ---NNL-SKO-DATA-AC-041-N18-02-EXT_eth1/50_C00964449
+  mtu 9216
+  ip address 172.17.124.138/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/6
+  description free_go_alpha_C01269388
+  mtu 9216
+  ip address 172.17.124.170/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/7
+  description ---NNS_SKO-DATA-AC-041-E22-02-EXT_Eth1/50_C00996671_ZNO0103071361
+  mtu 9216
+  ip address 172.17.124.202/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/8
+  description ---NNS_SKO-DATA-AC-041-M18-04-EXT_Eth1/50_C01199153
+  mtu 9216
+  ip address 172.17.124.234/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/9
+  description ---NNL-SKO-DATA-AC-041-E18-02-EXT_eth1/50_C01217135
+  mtu 9216
+  ip address 172.17.125.10/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/10
+  description ---NNS_SKO-DATA-AC-041-leaf038-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.42/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/11
+  description ---NNS_SKO-DATA-AC-041-leaf042-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.74/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/12
+  description ---NNS_SKO-DATA-AC-041-leaf046-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.106/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/13
+  description ---NNS_SKO-DATA-AC-041-leaf050-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.138/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/14
+  description ---NNS_SKO-DATA-AC-041-leaf054-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.170/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/15
+  description ---NNS_SKO-DATA-AC-041-leaf058-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.202/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/16
+  description ---NNL-SKO-DATA-AC-041-P09-02-EXT_eth1/50_C01330682
+  mtu 9216
+  ip address 172.17.125.234/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/17
+  description ---NNL-SKO-DATA-AC-041-F31-02-EXT_Eth1/50_C01552821
+  mtu 9216
+  ip address 172.18.10.10/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/18
+  description ---NNL-SKO-DATA-AC-041-leaf070-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.42/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/19
+  description ---NNL-SKO-DATA-AC-041-leaf074-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.74/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/20
+  description ---NNL-SKO-DATA-AC-041-leaf078-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.106/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/21
+  description ---NNL-SKO-DATA-AC-041-leaf082-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.138/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/22
+  description ---NNL-SKO-DATA-AC-041-leaf086-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.170/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/23
+  description ---NNL-SKO-DATA-AC-041-leaf090-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.202/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/24
+  description ---NNL-SKO-DATA-AC-041-leaf094-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.234/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet2/25
+  description unused_uplink
+  no shutdown
+
+interface Ethernet2/26
+  description unused_uplink
+  no shutdown
+
+interface Ethernet2/27
+  description unused_uplink
+  no shutdown
+
+interface Ethernet2/28
+  description unused_uplink
+  no shutdown
+
+interface Ethernet2/29
+  description ---NSS_SKO-DATA-SS-MD1-N04-01-EXT_Eth2/11
+  mtu 9216
+  channel-group 11 mode active
+  no shutdown
+
+interface Ethernet2/30
+  description ---NSS_SKO-DATA-SS-MD1-N04-02-EXT_Eth2/11
+  mtu 9216
+  channel-group 12 mode active
+  no shutdown
+
+interface Ethernet2/31
+  description ---NSS_SKO-DATA-SS-MD2-N04-01-EXT_Eth2/11
+  mtu 9216
+  channel-group 21 mode active
+  no shutdown
+
+interface Ethernet2/32
+  description ---NSS_SKO-DATA-SS-MD2-N04-02-EXT_Eth2/11
+  mtu 9216
+  channel-group 22 mode active
+  no shutdown
+
+interface Ethernet3/1
+  description ---NNS_SKO-DATA-AC-041-K09-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.124.18/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/2
+  description ---NNL-SKO-DATA-AC-041-D18-01-EXT_eth1/50_C01188001
+  mtu 9216
+  ip address 172.17.124.50/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/3
+  description ---NNL-SKO-DATA-AC-041-J18-01-EXT_eth1/50_C00964449
+  mtu 9216
+  ip address 172.17.124.82/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/4
+  description ---Demontage_C01907076
+  mtu 9216
+  ip address 172.17.124.114/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/5
+  description ---NNL-SKO-DATA-AC-041-I18-01-EXT_eth1/50_C00964449
+  mtu 9216
+  ip address 172.17.124.146/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/6
+  description ---NNL-SKO-DATA-AC-041-F18-01-EXT_eth1/50_C01118522
+  mtu 9216
+  ip address 172.17.124.178/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/7
+  description ---NNL-SKO-DATA-AC-041-P27-01-EXT_eth1/50_C01178620
+  mtu 9216
+  ip address 172.17.124.210/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/8
+  description ---NNL-SKO-DATA-AC-041-Q13-01-EXT_eth1/50_C01238605
+  mtu 9216
+  ip address 172.17.124.242/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/9
+  description ---NNS_SKO-DATA-AC-041-leaf035-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.18/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/10
+  description ---NNS_SKO-DATA-AC-041-leaf039-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.50/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/11
+  description ---NNS_SKO-DATA-AC-041-leaf043-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.82/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/12
+  description ---NNS_SKO-DATA-AC-041-leaf047-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.114/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/13
+  description ---NNS_SKO-DATA-AC-041-leaf051-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.146/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/14
+  description ---NNS_SKO-DATA-AC-041-leaf055-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.178/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/15
+  description ---NNL-SKO-DATA-AC-041-O09-01-EXT_eth1/50_C01330682
+  mtu 9216
+  ip address 172.17.125.210/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/16
+  description ---NNL-SKO-DATA-AC-041-Q09-01-EXT_eth1/50_C01351293
+  mtu 9216
+  ip address 172.17.125.242/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/17
+  description ---NNL-SKO-DATA-AC-041-R13-01-EXT_Eth1/50_C01750187
+  mtu 9216
+  ip address 172.18.10.18/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/18
+  description ---NNL-SKO-DATA-AC-041-leaf071-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.50/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/19
+  description ---NNL-SKO-DATA-AC-041-leaf075-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.82/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/20
+  description ---NNL-SKO-DATA-AC-041-leaf079-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.114/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/21
+  description ---NNL-SKO-DATA-AC-041-leaf083-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.146/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/22
+  description ---NNL-SKO-DATA-AC-041-leaf087-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.178/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/23
+  description ---NNL-SKO-DATA-AC-041-leaf091-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.210/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/24
+  description ---NNL-SKO-DATA-AC-041-leaf095-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.242/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet3/25
+  description unused_uplink
+  no shutdown
+
+interface Ethernet3/26
+  description unused_uplink
+  no shutdown
+
+interface Ethernet3/27
+  description unused_uplink
+  no shutdown
+
+interface Ethernet3/28
+  description unused_uplink
+  no shutdown
+
+interface Ethernet3/29
+  description ---NSS_SKO-DATA-SS-MD1-N04-01-EXT_Eth1/12
+  mtu 9216
+  channel-group 11 mode active
+  no shutdown
+
+interface Ethernet3/30
+  description ---NSS_SKO-DATA-SS-MD1-N04-02-EXT_Eth1/12
+  mtu 9216
+  channel-group 12 mode active
+  no shutdown
+
+interface Ethernet3/31
+  description ---NSS_SKO-DATA-SS-MD2-N04-01-EXT_Eth1/12
+  mtu 9216
+  channel-group 21 mode active
+  no shutdown
+
+interface Ethernet3/32
+  description ---NSS_SKO-DATA-SS-MD2-N04-02-EXT_Eth1/12
+  mtu 9216
+  channel-group 22 mode active
+  no shutdown
+
+interface Ethernet4/1
+  description ---NNS_SKO-DATA-AC-041-L09-02-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.124.26/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/2
+  description ---NNL-SKO-DATA-AC-041-D18-02-EXT_eth1/50_C01188001
+  mtu 9216
+  ip address 172.17.124.58/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/3
+  description ---NNL-SKO-DATA-AC-041-J18-02-EXT_eth1/50_C00964449
+  mtu 9216
+  ip address 172.17.124.90/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/4
+  description ---NNL-SKO-DATA-AC-041-L18-02-EXT_eth1/50_C00964449
+  mtu 9216
+  ip address 172.17.124.122/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/5
+  description ---NNL-SKO-DATA-AC-041-I18-02-EXT_eth1/50_C00964449
+  mtu 9216
+  ip address 172.17.124.154/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/6
+  description ---NNL-SKO-DATA-AC-041-F18-02-EXT_eth1/50_C01118522
+  mtu 9216
+  ip address 172.17.124.186/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/7
+  description ---NNL-SKO-DATA-AC-041-P27-02-EXT_eth1/50_C01178620
+  mtu 9216
+  ip address 172.17.124.218/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/8
+  description ---NNL-SKO-DATA-AC-041-Q13-02-EXT_eth1/50_C01238605
+  mtu 9216
+  ip address 172.17.124.250/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/9
+  description ---NNS_SKO-DATA-AC-041-leaf036-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.26/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/10
+  description ---NNS_SKO-DATA-AC-041-leaf040-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.58/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/11
+  description ---NNS_SKO-DATA-AC-041-leaf044-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.90/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/12
+  description ---NNS_SKO-DATA-AC-041-leaf048-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.122/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/13
+  description ---NNS_SKO-DATA-AC-041-leaf052-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.154/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/14
+  description ---NNS_SKO-DATA-AC-041-leaf056-01-EXT_Eth1/50
+  mtu 9216
+  ip address 172.17.125.186/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/15
+  description ---NNL-SKO-DATA-AC-041-O09-02-EXT_eth1/50_C01330682
+  mtu 9216
+  ip address 172.17.125.218/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/16
+  description ---NNL-SKO-DATA-AC-041-Q09-02-EXT_eth1/50_C01351293
+  mtu 9216
+  ip address 172.17.125.250/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/17
+  description ---NNL-SKO-DATA-AC-041-leaf068-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.26/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/18
+  description ---NNL-SKO-DATA-AC-041-leaf072-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.58/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/19
+  description ---NNL-SKO-DATA-AC-041-leaf076-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.90/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/20
+  description ---NNL-SKO-DATA-AC-041-leaf080-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.122/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/21
+  description ---NNL-SKO-DATA-AC-041-leaf084-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.154/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/22
+  description ---NNL-SKO-DATA-AC-041-leaf088-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.186/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/23
+  description ---NNL-SKO-DATA-AC-041-leaf092-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.218/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/24
+  description ---NNL-SKO-DATA-AC-041-leaf096-01-EXT_eth1/50
+  mtu 9216
+  ip address 172.18.10.250/31
+  ip ospf network point-to-point
+  ip router ospf underlay area 0.0.4.1
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  evpn multisite fabric-tracking
+  no shutdown
+
+interface Ethernet4/25
+  no shutdown
+
+interface Ethernet4/26
+  no shutdown
+
+interface Ethernet4/27
+  no shutdown
+
+interface Ethernet4/28
+  no shutdown
+
+interface Ethernet4/29
+  description ---NSS_SKO-DATA-SS-MD1-N04-01-EXT_Eth2/12
+  mtu 9216
+  channel-group 11 mode active
+  no shutdown
+
+interface Ethernet4/30
+  description ---NSS_SKO-DATA-SS-MD1-N04-02-EXT_Eth2/12
+  mtu 9216
+  channel-group 12 mode active
+  no shutdown
+
+interface Ethernet4/31
+  description ---NSS_SKO-DATA-SS-MD2-N04-01-EXT_Eth2/12
+  mtu 9216
+  channel-group 21 mode active
+  no shutdown
+
+interface Ethernet4/32
+  description ---NSS_SKO-DATA-SS-MD2-N04-02-EXT_Eth2/12
+  mtu 9216
+  channel-group 22 mode active
+  no shutdown
+
+interface mgmt0
+  no cdp enable
+  vrf member management
+  ip address 10.43.131.2/25
+
+interface loopback0
+  ip address 172.17.119.94/32 tag 65541
+  ip router ospf underlay area 0.0.4.1
+  ip pim sparse-mode
+
+interface loopback1
+  description Anycast RP
+  ip address 172.17.119.212/32 tag 65541
+  ip router ospf underlay area 0.0.4.1
+  ip pim sparse-mode
+
+interface loopback2
+  description Anycast RP
+  ip address 172.17.119.41/32
+  ip router ospf underlay area 0.0.4.1
+  ip pim sparse-mode
+
+interface loopback100
+  description DCI VTEP
+  ip address 172.17.119.210/32 tag 65541
+  ip router ospf underlay area 0.0.4.1
+
+interface loopback201
+  description VRF_eAZ
+  vrf member eAZ
+  ip address 10.32.197.6/32 tag 62000
+
+interface loopback202
+  description VRF_eFZ
+  vrf member eFZ
+  ip address 10.33.197.6/32 tag 62000
+
+interface loopback203
+  description VRF_eMZ
+  vrf member eMZ
+  ip address 10.35.193.6/32 tag 62000
+
+interface loopback204
+  description VRF_eDZ
+  vrf member eDZ
+  ip address 10.36.197.6/32 tag 62000
+
+interface loopback205
+  description VRF_ePZ
+  vrf member ePZ
+  ip address 10.37.197.6/32 tag 62000
+
+interface loopback206
+  description VRF_eUZ
+  vrf member eUZ
+  ip address 10.38.197.6/32 tag 62000
+
+interface loopback207
+  description VRF_eBZ
+  vrf member eBZ
+  ip address 10.34.197.6/32 tag 62000
+
+interface loopback208
+  description VRF_e08Z
+  vrf member e08Z
+  ip address 10.47.250.6/32 tag 62000
+
+interface loopback209
+  description VRF_e09Z
+  vrf member e09Z
+  ip address 10.47.234.6/32 tag 62000
+
+interface loopback210
+  description VRF_e10Z
+  vrf member e10Z
+  ip address 10.47.218.6/32 tag 62000
+
+interface loopback211
+  description VRF_e11Z
+  vrf member e11Z
+  ip address 10.47.202.6/32 tag 62000
+
+interface loopback212
+  description VRF_e12Z
+  vrf member e12Z
+  ip address 10.47.186.6/32 tag 62000
+
+interface loopback213
+  description VRF_e13Z
+  vrf member e13Z
+  ip address 10.47.170.6/32 tag 62000
+
+interface loopback214
+  description VRF_e14Z
+  vrf member e14Z
+  ip address 10.47.154.6/32 tag 62000
+
+interface loopback215
+  description VRF_e15Z
+  vrf member e15Z
+  ip address 10.47.138.6/32 tag 62000
+
+interface loopback216
+  description VRF_e16Z
+  vrf member e16Z
+  ip address 10.47.122.6/32 tag 62000
+
+interface loopback217
+  description VRF_e17Z
+  vrf member e17Z
+  ip address 10.47.106.6/32 tag 62000
+
+interface loopback218
+  description VRF_e18Z
+  vrf member e18Z
+  ip address 10.47.90.6/32 tag 62000
+
+interface loopback219
+  description VRF_e19Z
+  vrf member e19Z
+  ip address 10.47.74.6/32 tag 62000
+
+interface loopback220
+  description VRF_e20Z
+  vrf member e20Z
+  ip address 10.47.58.6/32 tag 62000
+
+interface loopback221
+  description VRF_e21Z
+  vrf member e21Z
+  ip address 10.47.42.6/32 tag 62000
+
+interface loopback222
+  description VRF_e22Z
+  vrf member e22Z
+  ip address 10.47.26.6/32 tag 62000
+
+interface loopback223
+  description VRF_e23Z
+  vrf member e23Z
+  ip address 10.47.10.6/32 tag 62000
+
+interface loopback224
+  description VRF_e24Z
+  vrf member e24Z
+  ip address 10.46.250.6/32 tag 62000
+
+interface loopback225
+  description VRF_e25Z
+  vrf member e25Z
+  ip address 10.46.234.6/32 tag 62000
+
+interface loopback226
+  description VRF_e26Z
+  vrf member e26Z
+  ip address 10.46.218.6/32 tag 62000
+
+interface loopback227
+  description VRF_e27Z
+  vrf member e27Z
+  ip address 10.46.202.6/32 tag 62000
+
+interface loopback228
+  description VRF_e28Z
+  vrf member e28Z
+  ip address 10.46.186.6/32 tag 62000
+
+interface loopback229
+  description VRF_e29Z
+  vrf member e29Z
+  ip address 10.46.170.6/32 tag 62000
+
+interface loopback230
+  description VRF_e30Z
+  vrf member e30Z
+  ip address 10.46.154.6/32 tag 62000
+
+interface loopback231
+  description VRF_e31Z
+  vrf member e31Z
+  ip address 10.46.138.6/32 tag 62000
+
+interface loopback232
+  description VRF_e32Z
+  vrf member e32Z
+  ip address 10.46.122.6/32 tag 62000
+
+interface loopback233
+  description VRF_e33Z
+  vrf member e33Z
+  ip address 10.46.106.6/32 tag 62000
+
+interface loopback234
+  description VRF_e34Z
+  vrf member e34Z
+  ip address 10.46.90.6/32 tag 62000
+
+interface loopback247
+  description VRF_e47Z
+  vrf member e47Z
+  ip address 10.45.138.6/32 tag 62000
+
+interface loopback251
+  description VRF_e51Z
+  vrf member e51Z
+  ip address 10.45.68.6/32 tag 62000
+
+interface loopback252
+  description VRF_e52Z
+  vrf member e52Z
+  ip address 10.45.58.6/32 tag 62000
+
+interface loopback253
+  description VRF_e53Z
+  vrf member e53Z
+  ip address 10.45.42.6/32 tag 62000
+
+interface loopback257
+  description VRF_e57Z
+  vrf member e57Z
+  ip address 10.44.233.6/32 tag 62000
+
+interface loopback258
+  description VRF_e58Z
+  vrf member e58Z
+  ip address 10.44.218.6/32 tag 62000
+
+interface loopback261
+  description VRF_e61Z
+  vrf member e61Z
+  ip address 10.44.170.6/32 tag 62000
+
+interface loopback263
+  description VRF_eMGRZ-TAUOUT
+  vrf member eMGRZ-TAUOUT
+  ip address 10.45.151.6/32 tag 62000
+
+interface loopback264
+  description VRF_eMGRZ-SIGMA
+  vrf member eMGRZ-SIGMA
+  ip address 10.45.151.134/32 tag 62000
+
+interface loopback265
+  description VRF_eTZ-TECH
+  vrf member eTZ-TECH
+  ip address 10.45.145.6/32 tag 62000
+
+interface loopback266
+  description VRF_eTZ-GATE
+  vrf member eTZ-GATE
+  ip address 10.45.145.134/32 tag 62000
+
+interface loopback267
+  description VRF_eTZ-FPSU-TLS
+  vrf member eTZ-FPSU-TLS
+  ip address 10.45.146.6/32 tag 62000
+
+interface loopback268
+  description VRF_eTZ-FPSU-eDigital
+  vrf member eTZ-FPSU-eDigital
+  ip address 10.45.146.134/32 tag 62000
+
+interface loopback269
+  description VRF_eTZ-FPSU-SBT
+  vrf member eTZ-FPSU-SBT
+  ip address 10.45.147.6/32 tag 62000
+
+interface loopback270
+  description VRF_eTZ-FPSU-VDI
+  vrf member eTZ-FPSU-VDI
+  ip address 10.45.147.134/32 tag 62000
+
+interface loopback271
+  description VRF_eTZ-VPN-EXT-ORG
+  vrf member eTZ-VPN-EXT-ORG
+  ip address 10.45.148.6/32 tag 62000
+
+interface loopback272
+  description VRF_eTZ-FPSU-OTHER
+  vrf member eTZ-FPSU-OTHER
+  ip address 10.45.149.6/32 tag 62000
+
+interface loopback273
+  description VRF_eTZ-SUBS
+  vrf member eTZ-SUBS
+  ip address 10.45.150.6/32 tag 62000
+
+interface loopback274
+  description VRF_eTZ-FPSU-MGMT
+  vrf member eTZ-FPSU-MGMT
+  ip address 10.45.151.134/32 tag 62000
+
+interface loopback278
+  description VRF_eTZ-ENSYS-OUT
+  vrf member eTZ-ENSYS-OUT
+  ip address 10.41.101.77/32 tag 62000
+
+interface loopback287
+  description VRF_ENSYS-SERVICE
+  vrf member ENSYS-SERVICE
+  ip address 10.41.101.81/32 tag 62000
+
+interface loopback288
+  description VRF_ENSYS-MGMT
+  vrf member ENSYS-MGMT
+  ip address 10.41.101.85/32 tag 62000
+
+interface loopback289
+  description VRF_ENSYS-DMZ
+  vrf member ENSYS-DMZ
+  ip address 10.41.101.89/32 tag 62000
+cli alias name wr copy running-config startup-config
+line console
+  exec-timeout 15
+line vty
+  session-limit 14
+  exec-timeout 15
+  access-class ACL_PROTECT_SSH in
+boot nxos bootflash:/nxos.9.3.4.bin sup-1
+boot nxos bootflash:/nxos.9.3.4.bin sup-2
+router ospf underlay
+  bfd
+  router-id 172.17.119.94
+  log-adjacency-changes
+  timers throttle spf 10 100 5000
+  timers lsa-group-pacing 10
+  timers lsa-arrival 80
+  timers throttle lsa 10 100 5000
+router bgp 65541
+  router-id 172.17.119.94
+  graceful-restart stalepath-time 1800
+  no enhanced-error
+  log-neighbor-changes
+  bmp-server 1
+    address 10.35.242.45 port 5000
+    vrf management
+  address-family ipv4 unicast
+    redistribute direct route-map RMAP-REDIST-DIRECT
+    maximum-paths 4
+  address-family l2vpn evpn
+    nexthop trigger-delay critical 1 non-critical 1
+    retain route-target all
+  template peer BGW-OVERLAY
+    bmp-activate-server 1
+    remote-as 65541
+    update-source loopback0
+    address-family l2vpn evpn
+      send-community extended
+      maximum-prefix 300000 warning-only
+  template peer LEAF-PEERS
+    bmp-activate-server 1
+    remote-as 65541
+    update-source loopback0
+    address-family l2vpn evpn
+      send-community
+      send-community extended
+      route-reflector-client
+      maximum-prefix 50000 warning-only
+  template peer RS-OVERLAY
+    bmp-activate-server 1
+    remote-as 65205
+    update-source loopback0
+    ebgp-multihop 5
+    peer-type fabric-external
+    address-family l2vpn evpn
+      send-community
+      send-community extended
+      maximum-prefix 300000 warning-only
+  template peer SS-DCI
+    bfd
+    bmp-activate-server 1
+    remote-as 65554
+    address-family ipv4 unicast
+      maximum-prefix 10000 warning-only
+  neighbor 172.17.114.72
+    inherit peer SS-DCI
+    description SKO-DATA-SS-MD1-N04-01-EXT
+  neighbor 172.17.114.74
+    inherit peer SS-DCI
+    description SKO-DATA-SS-MD1-N04-02-EXT
+  neighbor 172.17.114.76
+    inherit peer SS-DCI
+    description SKO-DATA-SS-MD2-N04-01-EXT
+  neighbor 172.17.114.78
+    inherit peer SS-DCI
+    description SKO-DATA-SS-MD2-N04-02-EXT
+  neighbor 172.17.119.93
+    inherit peer BGW-OVERLAY
+    description SKO-DATA-AG-041-K04-01-EXT
+  neighbor 172.17.119.95
+    inherit peer BGW-OVERLAY
+    description SKO-DATA-AG-041-O04-01-EXT
+  neighbor 172.17.119.96
+    inherit peer BGW-OVERLAY
+    description SKO-DATA-AG-041-Q04-01-EXT
+  neighbor 172.17.126.1
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf001-01-EXT
+  neighbor 172.17.126.2
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf002-01-EXT
+  neighbor 172.17.126.3
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf003-01-EXT
+  neighbor 172.17.126.4
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf004-01-EXT
+  neighbor 172.17.126.5
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf005-01-EXT
+  neighbor 172.17.126.6
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf006-01-EXT
+  neighbor 172.17.126.7
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf007-01-EXT
+  neighbor 172.17.126.8
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf008-01-EXT
+  neighbor 172.17.126.9
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf009-01-EXT
+  neighbor 172.17.126.10
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf010-01-EXT
+  neighbor 172.17.126.11
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf011-01-EXT
+  neighbor 172.17.126.12
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf012-01-EXT
+  neighbor 172.17.126.13
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf013-01-EXT
+  neighbor 172.17.126.14
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf014-01-EXT
+  neighbor 172.17.126.15
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf015-01-EXT
+  neighbor 172.17.126.16
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf016-01-EXT
+  neighbor 172.17.126.17
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf017-01-EXT
+  neighbor 172.17.126.18
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf018-01-EXT
+  neighbor 172.17.126.19
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf019-01-EXT
+  neighbor 172.17.126.20
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf020-01-EXT
+  neighbor 172.17.126.21
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf021-01-EXT
+  neighbor 172.17.126.22
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf022-01-EXT
+  neighbor 172.17.126.23
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf023-01-EXT
+  neighbor 172.17.126.24
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf024-01-EXT
+  neighbor 172.17.126.25
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf025-01-EXT
+  neighbor 172.17.126.26
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf026-01-EXT
+  neighbor 172.17.126.27
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf027-01-EXT
+  neighbor 172.17.126.28
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf028-01-EXT
+  neighbor 172.17.126.29
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf029-01-EXT
+  neighbor 172.17.126.30
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf030-01-EXT
+  neighbor 172.17.126.31
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf031-01-EXT
+  neighbor 172.17.126.32
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf032-01-EXT
+  neighbor 172.17.126.33
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf033-01-EXT
+  neighbor 172.17.126.34
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf034-01-EXT
+  neighbor 172.17.126.35
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf035-01-EXT
+  neighbor 172.17.126.36
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf036-01-EXT
+  neighbor 172.17.126.37
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf037-01-EXT
+  neighbor 172.17.126.38
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf038-01-EXT
+  neighbor 172.17.126.39
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf039-01-EXT
+  neighbor 172.17.126.40
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf040-01-EXT
+  neighbor 172.17.126.41
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf041-01-EXT
+  neighbor 172.17.126.42
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf042-01-EXT
+  neighbor 172.17.126.43
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf043-01-EXT
+  neighbor 172.17.126.44
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf044-01-EXT
+  neighbor 172.17.126.45
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf045-01-EXT
+  neighbor 172.17.126.46
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf046-01-EXT
+  neighbor 172.17.126.47
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf047-01-EXT
+  neighbor 172.17.126.48
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf048-01-EXT
+  neighbor 172.17.126.49
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf049-01-EXT
+  neighbor 172.17.126.50
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf050-01-EXT
+  neighbor 172.17.126.51
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf051-01-EXT
+  neighbor 172.17.126.52
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf052-01-EXT
+  neighbor 172.17.126.53
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf053-01-EXT
+  neighbor 172.17.126.54
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf054-01-EXT
+  neighbor 172.17.126.55
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf055-01-EXT
+  neighbor 172.17.126.56
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf056-01-EXT
+  neighbor 172.17.126.57
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf057-01-EXT
+  neighbor 172.17.126.58
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf058-01-EXT
+  neighbor 172.17.126.59
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf059-01-EXT
+  neighbor 172.17.126.60
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf060-01-EXT
+  neighbor 172.17.126.61
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf061-01-EXT
+  neighbor 172.17.126.62
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf062-01-EXT
+  neighbor 172.17.126.63
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf063-01-EXT
+  neighbor 172.17.126.64
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf064-01-EXT
+  neighbor 172.18.7.251
+    inherit peer RS-OVERLAY
+    description SKO-DATA-RS-MD1-N04-01-EXT
+  neighbor 172.18.7.252
+    inherit peer RS-OVERLAY
+    description SKO-DATA-RS-MD1-N04-02-EXT
+  neighbor 172.18.7.253
+    inherit peer RS-OVERLAY
+    description SKO-DATA-RS-MD2-N04-01-EXT
+  neighbor 172.18.7.254
+    inherit peer RS-OVERLAY
+    description SKO-DATA-RS-MD2-N04-02-EXT
+  neighbor 172.18.11.65
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf065-01-EXT
+  neighbor 172.18.11.66
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf066-01-EXT
+  neighbor 172.18.11.67
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf067-01-EXT
+  neighbor 172.18.11.68
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf068-01-EXT
+  neighbor 172.18.11.69
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf069-01-EXT
+  neighbor 172.18.11.70
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf070-01-EXT
+  neighbor 172.18.11.71
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf071-01-EXT
+  neighbor 172.18.11.72
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf072-01-EXT
+  neighbor 172.18.11.73
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf073-01-EXT
+  neighbor 172.18.11.74
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf074-01-EXT
+  neighbor 172.18.11.75
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf075-01-EXT
+  neighbor 172.18.11.76
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf076-01-EXT
+  neighbor 172.18.11.77
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf077-01-EXT
+  neighbor 172.18.11.78
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf078-01-EXT
+  neighbor 172.18.11.79
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf079-01-EXT
+  neighbor 172.18.11.80
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf080-01-EXT
+  neighbor 172.18.11.81
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf081-01-EXT
+  neighbor 172.18.11.82
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf082-01-EXT
+  neighbor 172.18.11.83
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf083-01-EXT
+  neighbor 172.18.11.84
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf084-01-EXT
+  neighbor 172.18.11.85
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf085-01-EXT
+  neighbor 172.18.11.86
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf086-01-EXT
+  neighbor 172.18.11.87
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf087-01-EXT
+  neighbor 172.18.11.88
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf088-01-EXT
+  neighbor 172.18.11.89
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf089-01-EXT
+  neighbor 172.18.11.90
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf090-01-EXT
+  neighbor 172.18.11.91
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf091-01-EXT
+  neighbor 172.18.11.92
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf092-01-EXT
+  neighbor 172.18.11.93
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf093-01-EXT
+  neighbor 172.18.11.94
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf094-01-EXT
+  neighbor 172.18.11.95
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf095-01-EXT
+  neighbor 172.18.11.96
+    inherit peer LEAF-PEERS
+    description SKO-DATA-AC-041-leaf096-01-EXT
+  vrf ENSYS-DMZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-ENSYS-DMZ
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf ENSYS-MGMT
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-ENSYS-MGMT
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf ENSYS-SERVICE
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-ENSYS-SERVICE
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e08Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e08Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e09Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e09Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e10Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e10Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e11Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e11Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e12Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e12Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e13Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e13Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e14Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e14Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e15Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e15Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e16Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e16Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e17Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e17Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e18Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e18Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e19Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e19Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e20Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e20Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e21Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e21Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e22Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e22Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e23Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e23Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e24Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e24Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e25Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e25Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e26Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e26Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e27Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e27Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e28Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e28Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e29Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e29Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e30Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e30Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e31Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e31Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e32Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e32Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e33Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e33Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e34Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e34Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e47Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e47Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e51Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e51Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e52Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e52Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e53Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e53Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e57Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e57Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e58Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e58Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf e61Z
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-e61Z
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eAZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eAZ
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eBZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eBZ
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eDZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eDZ
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eFZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eFZ
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eMGRZ-SIGMA
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eMGRZ-SIGMA
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eMGRZ-TAUOUT
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eMGRZ-TAUOUT
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eMZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eMZ
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf ePZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-ePZ
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-ENSYS-OUT
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-ENSYS-OUT
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-FPSU-MGMT
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-FPSU-MGMT
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-FPSU-OTHER
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-FPSU-OTHER
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-FPSU-SBT
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-FPSU-SBT
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-FPSU-TLS
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-FPSU-TLS
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-FPSU-VDI
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-FPSU-VDI
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-FPSU-eDigital
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-FPSU-eDigital
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-GATE
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-GATE
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-SUBS
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-SUBS
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-TECH
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-TECH
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eTZ-VPN-EXT-ORG
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eTZ-VPN-EXT-ORG
+      maximum-paths 16
+      maximum-paths ibgp 16
+  vrf eUZ
+    graceful-restart stalepath-time 1800
+    address-family ipv4 unicast
+      redistribute direct route-map RM-REDIST-DIRECT-eUZ
+      maximum-paths 16
+      maximum-paths ibgp 16
+evpn
+  vni 2032515 l2
+    rd auto
+    route-target import 62000:2032515
+    route-target export 62000:2032515
+  vni 2040014 l2
+    rd auto
+    route-target import 62000:2040014
+    route-target export 62000:2040014
+  vni 2040015 l2
+    rd auto
+    route-target import 62000:2040015
+    route-target export 62000:2040015
+  vni 2040016 l2
+    rd auto
+    route-target import 62000:2040016
+    route-target export 62000:2040016
+  vni 2040017 l2
+    rd auto
+    route-target import 62000:2040017
+    route-target export 62000:2040017
+  vni 2040018 l2
+    rd auto
+    route-target import 62000:2040018
+    route-target export 62000:2040018
+  vni 2040019 l2
+    rd auto
+    route-target import 62000:2040019
+    route-target export 62000:2040019
+  vni 2040020 l2
+    rd auto
+    route-target import 62000:2040020
+    route-target export 62000:2040020
+  vni 2040021 l2
+    rd auto
+    route-target import 62000:2040021
+    route-target export 62000:2040021
+  vni 2040022 l2
+    rd auto
+    route-target import 62000:2040022
+    route-target export 62000:2040022
+  vni 2040023 l2
+    rd auto
+    route-target import 62000:2040023
+    route-target export 62000:2040023
+  vni 2040024 l2
+    rd auto
+    route-target import 62000:2040024
+    route-target export 62000:2040024
+  vni 2040025 l2
+    rd auto
+    route-target import 62000:2040025
+    route-target export 62000:2040025
+  vni 2040026 l2
+    rd auto
+    route-target import 62000:2040026
+    route-target export 62000:2040026
+  vni 2040027 l2
+    rd auto
+    route-target import 62000:2040027
+    route-target export 62000:2040027
+  vni 2042097 l2
+    rd auto
+    route-target import 62000:2042097
+    route-target export 62000:2042097
+  vni 2042098 l2
+    rd auto
+    route-target import 62000:2042098
+    route-target export 62000:2042098
+  vni 2042100 l2
+    rd auto
+    route-target import 62000:2042100
+    route-target export 62000:2042100
+  vni 2240219 l2
+    rd auto
+    route-target import 62000:2240219
+    route-target export 62000:2240219
+  vni 2240220 l2
+    rd auto
+    route-target import 62000:2240220
+    route-target export 62000:2240220
+  vni 2240221 l2
+    rd auto
+    route-target import 62000:2240221
+    route-target export 62000:2240221
+  vni 2240222 l2
+    rd auto
+    route-target import 62000:2240222
+    route-target export 62000:2240222
+  vni 2240223 l2
+    rd auto
+    route-target import 62000:2240223
+    route-target export 62000:2240223
+  vni 2240224 l2
+    rd auto
+    route-target import 62000:2240224
+    route-target export 62000:2240224
+  vni 2240225 l2
+    rd auto
+    route-target import 62000:2240225
+    route-target export 62000:2240225
+  vni 2240226 l2
+    rd auto
+    route-target import 62000:2240226
+    route-target export 62000:2240226
+  vni 8993699 l2
+    rd auto
+    route-target import 62000:8993699
+    route-target export 62000:8993699
+  vni 9033502 l2
+    rd auto
+    route-target import 62000:9033502
+    route-target export 62000:9033502
+event manager applet CHECK_EOR
+  event syslog pattern "SYSMGR-2-SWITCHOVER_OVER: Switchover completed"
+  action 1.0 syslog priority critical msg check_eor eem triggered
+  action 2.0 cli sleep 1700
+  action 3.0 syslog priority critical msg check_eor sleep finished
+  action 4.0 cli source check_eor.py
+  action 5.0 syslog priority critical msg check_eor eem finished
+event manager applet SHUTDOWN_MODULE
+  event syslog pattern "MODULE-.-MOD_WARNING:.*Module .*reported warning due to fatal error"
+  action 1.0 cli source shutdown_module.py "$_syslog_msg"
+event manager applet custom_link_flap override __ethpm_link_flap
+  event policy-default count 15 time 1050
+
+l2rib dup-host-mac-detection 6 60
+l2rib dup-host-mac-recovery 120 3000
+logging logfile messages 6
+logging server 10.47.65.201 6 use-vrf management
+logging server 10.47.65.135 6 use-vrf management
+logging server 10.47.65.145 6 use-vrf management
+logging source-interface mgmt0
+logging timestamp milliseconds
+logging monitor 6
+no logging console
+logging origin-id hostname
+
+

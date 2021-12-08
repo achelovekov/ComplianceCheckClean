@@ -1,0 +1,30 @@
+{
+    "serviceName": "VNI",
+    "subServices": [
+      {
+        "serviceName": "L2VNI",
+        "footprintDefinition": "services/VNI/L2VNI.json",
+        "streeDefinition": "filename",
+        "ttpTemplates": [
+          "l2BD",
+          "sviIf",
+          "rtctrlBDEvi",
+          "nvoNw_L2"
+        ],
+        "subServices": []
+      },
+      {
+        "serviceName": "L3VNI",
+        "footprintDefinition": "services/VNI/L3VNI.json",
+        "streeDefinition": "filename",
+        "ttpTemplates": [
+          "l3Inst",
+          "l2BD",
+          "sviIf",
+          "nvoNw_L3",
+          "bgp"
+        ],
+        "subServices": []
+      }
+    ]
+  }

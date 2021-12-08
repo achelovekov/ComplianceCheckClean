@@ -1,0 +1,195 @@
+[
+    {
+        "path": [
+          "l3Inst"
+        ],
+        "rootKeys": [
+          {
+            "parent": "l3Inst",
+            "checkReference": [
+              {
+                "fieldNameToCheck": "id",
+                "referenceAliasToRead": "vrf"
+              }
+            ],
+            "setReference": [
+                {
+                    "fieldNameToSet": "vnid",
+                    "referenceAliasToWrite": "l3vni"
+                }
+            ]
+          }
+        ],
+        "nodesReference": [
+          {
+            "nodeName": "l3Inst",
+            "rootKeys": [
+              "id",
+              "vnid"
+            ],
+            "nonRootKeys": [
+              {
+                "path": [
+                  "ipv4Afi"
+                ],
+                "keys": [
+                  "rtExport",
+                  "rtImport",
+                  "rtExportEvpn",
+                  "rtImportEvpn"
+                ]
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "path": [
+          "nvoNw"
+        ],
+        "rootKeys": [
+          {
+            "parent": "nvoNw",
+            "checkReference": [
+              {
+                "fieldNameToCheck": "id",
+                "referenceAliasToRead": "l3vni"
+              }
+            ],
+            "setReference": []
+          }
+        ],
+        "nodesReference": [
+          {
+            "nodeName": "nvoNw",
+            "rootKeys": [
+              "id",
+              "mode"
+            ],
+            "nonRootKeys": []
+          }
+        ]
+      },
+      {
+        "path": [
+          "l2BD"
+        ],
+        "rootKeys": [
+          {
+            "parent": "l2BD",
+            "checkReference": [
+              {
+                "fieldNameToCheck": "accEncap",
+                "referenceAliasToRead": "l3vni"
+              }
+            ],
+            "setReference": [
+              {
+                "fieldNameToSet": "id",
+                "referenceAliasToWrite": "sviId"
+              }
+            ]
+          }
+        ],
+        "nodesReference": [
+          {
+            "nodeName": "l2BD",
+            "rootKeys": [
+              "accEncap",
+              "id",
+              "name"
+            ],
+            "nonRootKeys": []
+          }
+        ]
+      },
+      {
+        "path": [
+          "sviIf"
+        ],
+        "rootKeys": [
+          {
+            "parent": "sviIf",
+            "checkReference": [
+              {
+                "fieldNameToCheck": "id",
+                "referenceAliasToRead": "sviId"
+              }
+            ],
+            "setReference": []
+          }
+        ],
+        "nodesReference": [
+          {
+            "nodeName": "sviIf",
+            "rootKeys": [
+              "agw",
+              "ipForward",
+              "vrf",
+              "id",
+              "tag",
+              "description"
+            ],
+            "nonRootKeys": []
+          }
+        ]
+      },
+      {
+        "path": [
+          "bgp",
+          "vrfLite"
+        ],
+        "rootKeys": [
+          {
+            "parent": "vrfLite",
+            "checkReference": [
+              {
+                "fieldNameToCheck": "id",
+                "referenceAliasToRead": "vrf"
+              }
+            ],
+            "setReference": []
+          }
+        ],
+        "nodesReference": [
+          {
+            "nodeName": "vrfLite",
+            "rootKeys": [
+              "id",
+              "multipathRelax",
+              "stalePathTime"
+            ],
+            "nonRootKeys": [
+              {
+                "path": [
+                  "vrfIpv4Unicast"
+                ],
+                "keys": [
+                  "enabled",
+                  "ibgpMaxPath",
+                  "redistributeDirectRMap"
+                ]
+              }
+            ]
+          },
+          {
+            "nodeName": "bgp",
+            "rootKeys": [
+              "asn"
+            ],
+            "nonRootKeys": [
+              {
+                "path": [
+                  "bgpL2vpnEvpn"
+                ],
+                "keys": [
+                  "advertisePip",
+                  "delayCritical",
+                  "delayNonCritical"
+                ]
+              }
+            ]
+          }
+        ]
+      }
+]
