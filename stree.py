@@ -9,12 +9,19 @@ class Node(BaseModel):
 
 Node.update_forward_refs()
 
-def linesGenerator(filename):
+def linesGeneratorFromFile(filename):
     with open(filename) as file:
         for line in file:
             line = line.rstrip()
             if line:
                 yield line  
+
+def linesGeneratorFromConfig(config):
+    config = config.splitlines()
+    for line in config:
+        line = line.rstrip()
+        if line:
+            yield line 
 
 def wordsList(line):
     return [(index, word) for index, word in enumerate(line.split())]
@@ -102,10 +109,21 @@ def printNode(node:Node, depth, step, tmpStr, buf, filter):
         print(f"may be wrong path? {e}")
         exit()
 
-def stree(filename):
+def streeFromFile(filename):
     rootNode = Node(name='root')
     roots = {0: rootNode}
-    lG = linesGenerator(filename)
+    lG = linesGeneratorFromFile(filename)
+    currentBias = 0
+    lastElement = None
+
+    for line in lG: currentBias, lastElement = walk(roots, currentBias, line, lastElement) 
+
+    return rootNode
+
+def streeFromConfig(config):
+    rootNode = Node(name='root')
+    roots = {0: rootNode}
+    lG = linesGeneratorFromConfig(config)
     currentBias = 0
     lastElement = None
 

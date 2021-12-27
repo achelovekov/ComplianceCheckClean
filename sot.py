@@ -42,19 +42,19 @@ class ServiceSoT(BaseModel):
         for serviceItem in self:
             if serviceItem.serviceName == serviceName: 
                 return serviceItem
-            return None
+        return None
     
     def getSite(self, serviceItem, siteID):
         for siteItem in serviceItem.serviceVars:
             if siteItem.siteID == siteID:
                 return siteItem
-            return None
+        return None
     
     def getKey(self, siteItem, key):
         for keyItem in siteItem.siteVars:
             if keyItem.id.value == key:
                 return keyItem
-            return None
+        return None
 
     def getVarsByKey(self, serviceName, siteID, key) -> Dict:
         if serviceItem := self.getService(serviceName):

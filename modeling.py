@@ -183,3 +183,19 @@ def goRef(object: Dict, rootElement: RootElement, candidate: Dict, referenceValu
         return go(item, rootElement, candidate[currentNode], referenceValues)
   else:
     pass
+
+class ComplianceReportItem(BaseModel):
+    key: str
+    footprint: Dict
+    original: str
+    templated: str
+    deviceName: str
+
+class ComplianceReport(BaseModel):
+  __root__: List[ComplianceReportItem] = []
+
+  def append(self, complianceReportItem:ComplianceReportItem):
+    self.__root__.append(complianceReportItem)
+  
+  def __iter__(self):
+    return iter(self.__root__)

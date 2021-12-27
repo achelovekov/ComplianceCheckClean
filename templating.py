@@ -124,17 +124,17 @@ def indentBlock(step:int, bias:int, prefix:str, block:str):
         res.append(line)
     return '\n'.join(res)
 
-def genereteStreeOriginal(sTreeServiceProcessed: STreeServiceProcessed, filename):
+def genereteStreeOriginal(sTreeServiceProcessed: STreeServiceProcessed, config: str):
         
-    rootNode = stree(filename)
+    rootNode = streeFromConfig(config)
+
     result = ''
     for index, sTreeServiceProcessedItem in enumerate(sTreeServiceProcessed):
         printBuf = printPath(rootNode, sTreeServiceProcessedItem.path, sTreeServiceProcessedItem.filter)
-
-        result += indentBlock(2, sTreeServiceProcessedItem.bias, sTreeServiceProcessedItem.prefix, printBuf)
-
-        if index != len(sTreeServiceProcessed) - 1:
-            result += '\n'
+        if printBuf:
+            result += indentBlock(2, sTreeServiceProcessedItem.bias, sTreeServiceProcessedItem.prefix, printBuf)
+            if index != len(sTreeServiceProcessed) - 1:
+                result += '\n'
 
     return result
 
