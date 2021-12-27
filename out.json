@@ -1,0 +1,904 @@
+{
+    "l2BD": [
+        {
+            "accEncap": "2250004",
+            "id": "4",
+            "name": "e25Z_10.46.232.48/28_semarg_C00977763"
+        },
+        {
+            "accEncap": "2110007",
+            "id": "7",
+            "name": "e11Z_10.58.144.64/28_semarg-mgmt_C00943635"
+        },
+        {
+            "accEncap": "2110008",
+            "id": "8",
+            "name": "e11Z_10.58.145.64/28_semarg-public_C01062140"
+        },
+        {
+            "accEncap": "2070009",
+            "id": "9",
+            "name": "eBZ_10.54.224.224/28"
+        },
+        {
+            "accEncap": "2040014",
+            "id": "14",
+            "name": "eDZ_10.56.48.0/27_C00970844"
+        },
+        {
+            "accEncap": "2040015",
+            "id": "15",
+            "name": "eDZ_10.56.50.0/27_C00970844"
+        },
+        {
+            "accEncap": "2040016",
+            "id": "16",
+            "name": "eDZ_10.56.52.0/27_C00970844"
+        },
+        {
+            "accEncap": "2040017",
+            "id": "17",
+            "name": "eDZ_10.56.54.0/27_C00970844"
+        },
+        {
+            "accEncap": "2040018",
+            "id": "18",
+            "name": "eDZ_10.56.48.32/27_C00970844"
+        },
+        {
+            "accEncap": "2040019",
+            "id": "19",
+            "name": "eDZ_10.56.50.32/27_C00970844"
+        },
+        {
+            "accEncap": "2040020",
+            "id": "20",
+            "name": "eDZ_10.56.52.32/27_C00970844"
+        },
+        {
+            "accEncap": "2040021",
+            "id": "21",
+            "name": "eDZ_10.56.54.32/27_C00970844"
+        },
+        {
+            "accEncap": "2040022",
+            "id": "22",
+            "name": "eDZ_10.56.56.0/24_C01013159"
+        },
+        {
+            "accEncap": "2040023",
+            "id": "23",
+            "name": "eDZ_10.56.57.0/24_C01013159"
+        },
+        {
+            "accEncap": "2040024",
+            "id": "24",
+            "name": "eDZ_10.56.58.0/24_C01013159"
+        },
+        {
+            "accEncap": "2040025",
+            "id": "25",
+            "name": "eDZ_10.56.59.0/24_C01013159"
+        },
+        {
+            "accEncap": "2010049",
+            "id": "49",
+            "name": "eAZ_10.51.4.16/29_C01267806"
+        },
+        {
+            "accEncap": "2040160",
+            "id": "160",
+            "name": "eDZ_10.56.60.0/24_C01013159"
+        },
+        {
+            "accEncap": "2040161",
+            "id": "161",
+            "name": "eDZ_10.56.61.0/24_C01013159"
+        },
+        {
+            "accEncap": "2040162",
+            "id": "162",
+            "name": "eDZ_10.56.62.0/24_C01013159"
+        },
+        {
+            "accEncap": "2040163",
+            "id": "163",
+            "name": "eDZ_10.56.63.0/24_C01013159"
+        },
+        {
+            "accEncap": "2031050",
+            "id": "1000",
+            "name": "eMZ_10.60.207.112/29_C01478913"
+        },
+        {
+            "accEncap": "2031150",
+            "id": "1100",
+            "name": "eMZ_10.60.203.112/29_C01478913"
+        },
+        {
+            "accEncap": "2042097",
+            "id": "2097",
+            "name": "eDZ_10.56.6.0/28"
+        },
+        {
+            "accEncap": "2042098",
+            "id": "2098",
+            "name": "eDZ_10.56.6.16/28"
+        },
+        {
+            "accEncap": "2042100",
+            "id": "2100",
+            "name": "eDZ_10.56.6.32/28"
+        },
+        {
+            "accEncap": "2030000",
+            "id": "2103",
+            "name": "VRF_eMZ"
+        },
+        {
+            "accEncap": "2032515",
+            "id": "2515",
+            "name": "eMZ_10.35.128.0/23"
+        },
+        {
+            "accEncap": "2010000",
+            "id": "3901",
+            "name": "VRF_eAZ"
+        },
+        {
+            "accEncap": "2040000",
+            "id": "3904",
+            "name": "VRF_eDZ"
+        },
+        {
+            "accEncap": "2070000",
+            "id": "3907",
+            "name": "VRF_eBZ"
+        },
+        {
+            "accEncap": "2110000",
+            "id": "3911",
+            "name": "VRF_e11Z"
+        },
+        {
+            "accEncap": "2250000",
+            "id": "3925",
+            "name": "VRF_e25Z"
+        }
+    ],
+    "nvoNw": [
+        {
+            "id": "2010049",
+            "mcastGroup": "225.1.0.1",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2031050",
+            "mcastGroup": "none",
+            "mode": "L2VNI",
+            "replicationMethod": "IR",
+            "supressArp": "False"
+        },
+        {
+            "id": "2031150",
+            "mcastGroup": "none",
+            "mode": "L2VNI",
+            "replicationMethod": "IR",
+            "supressArp": "False"
+        },
+        {
+            "id": "2032515",
+            "mcastGroup": "225.1.0.3",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040014",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040015",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040016",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040017",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040018",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040019",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040020",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040021",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040022",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040023",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040024",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040025",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040160",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040161",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040162",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2040163",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2042097",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2042098",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2042100",
+            "mcastGroup": "225.1.0.4",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2070009",
+            "mcastGroup": "225.1.0.7",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2110007",
+            "mcastGroup": "225.1.0.11",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2110008",
+            "mcastGroup": "225.1.0.11",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        },
+        {
+            "id": "2250004",
+            "mcastGroup": "225.1.0.25",
+            "mode": "L2VNI",
+            "replicationMethod": "PIM",
+            "supressArp": "False"
+        }
+    ],
+    "rtctrlBDEvi": [
+        {
+            "id": "2032515",
+            "rd": "auto",
+            "rtExport": "62000:2032515",
+            "rtImport": "62000:2032515"
+        },
+        {
+            "id": "2040014",
+            "rd": "auto",
+            "rtExport": "62000:2040014",
+            "rtImport": "62000:2040014"
+        },
+        {
+            "id": "2040015",
+            "rd": "auto",
+            "rtExport": "62000:2040015",
+            "rtImport": "62000:2040015"
+        },
+        {
+            "id": "2040016",
+            "rd": "auto",
+            "rtExport": "62000:2040016",
+            "rtImport": "62000:2040016"
+        },
+        {
+            "id": "2040017",
+            "rd": "auto",
+            "rtExport": "62000:2040017",
+            "rtImport": "62000:2040017"
+        },
+        {
+            "id": "2040018",
+            "rd": "auto",
+            "rtExport": "62000:2040018",
+            "rtImport": "62000:2040018"
+        },
+        {
+            "id": "2040019",
+            "rd": "auto",
+            "rtExport": "62000:2040019",
+            "rtImport": "62000:2040019"
+        },
+        {
+            "id": "2040020",
+            "rd": "auto",
+            "rtExport": "62000:2040020",
+            "rtImport": "62000:2040020"
+        },
+        {
+            "id": "2040021",
+            "rd": "auto",
+            "rtExport": "62000:2040021",
+            "rtImport": "62000:2040021"
+        },
+        {
+            "id": "2040022",
+            "rd": "auto",
+            "rtExport": "62000:2040022",
+            "rtImport": "62000:2040022"
+        },
+        {
+            "id": "2040023",
+            "rd": "auto",
+            "rtExport": "62000:2040023",
+            "rtImport": "62000:2040023"
+        },
+        {
+            "id": "2040024",
+            "rd": "auto",
+            "rtExport": "62000:2040024",
+            "rtImport": "62000:2040024"
+        },
+        {
+            "id": "2040025",
+            "rd": "auto",
+            "rtExport": "62000:2040025",
+            "rtImport": "62000:2040025"
+        },
+        {
+            "id": "2040026",
+            "rd": "auto",
+            "rtExport": "62000:2040026",
+            "rtImport": "62000:2040026"
+        },
+        {
+            "id": "2040027",
+            "rd": "auto",
+            "rtExport": "62000:2040027",
+            "rtImport": "62000:2040027"
+        },
+        {
+            "id": "2042097",
+            "rd": "auto",
+            "rtExport": "62000:2042097",
+            "rtImport": "62000:2042097"
+        },
+        {
+            "id": "2042098",
+            "rd": "auto",
+            "rtExport": "62000:2042098",
+            "rtImport": "62000:2042098"
+        },
+        {
+            "id": "2042100",
+            "rd": "auto",
+            "rtExport": "62000:2042100",
+            "rtImport": "62000:2042100"
+        }
+    ],
+    "sviIf": [
+        {
+            "agw": "False",
+            "description": "none",
+            "id": "1",
+            "ipForward": "False",
+            "ipv4Addr": "none",
+            "ipv4Redirect": "False",
+            "mtu": "default",
+            "state": "unknown",
+            "tag": "None",
+            "vrf": "default"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "4",
+            "ipForward": "False",
+            "ipv4Addr": "10.46.232.62/28",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3925",
+            "vrf": "e25Z"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "7",
+            "ipForward": "False",
+            "ipv4Addr": "10.58.144.78/28",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3911",
+            "vrf": "e11Z"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "8",
+            "ipForward": "False",
+            "ipv4Addr": "10.58.145.78/28",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3911",
+            "vrf": "e11Z"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "9",
+            "ipForward": "False",
+            "ipv4Addr": "10.54.224.238/28",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3907",
+            "vrf": "eBZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "14",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.48.30/27",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "15",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.50.30/27",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "16",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.52.30/27",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "17",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.54.30/27",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "18",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.48.62/27",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "19",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.50.62/27",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "20",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.52.62/27",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "21",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.54.62/27",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "22",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.56.250/24",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "23",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.57.250/24",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "24",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.58.250/24",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "25",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.59.250/24",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "49",
+            "ipForward": "False",
+            "ipv4Addr": "10.51.4.22/29",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3901",
+            "vrf": "eAZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "160",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.60.250/24",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "161",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.61.250/24",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "162",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.62.250/24",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "163",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.63.250/24",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "1000",
+            "ipForward": "False",
+            "ipv4Addr": "10.60.207.118/29",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3903",
+            "vrf": "eMZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "1100",
+            "ipForward": "False",
+            "ipv4Addr": "10.60.203.118/29",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3903",
+            "vrf": "eMZ"
+        },
+        {
+            "agw": "False",
+            "description": "eDZ_iBGP-P2P_over-Peerlink",
+            "id": "2004",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.192.202/31",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "2097",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.6.14/28",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "2098",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.6.30/28",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "2100",
+            "ipForward": "False",
+            "ipv4Addr": "10.56.6.46/28",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "3904",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "False",
+            "description": "VRF_eMZ",
+            "id": "2103",
+            "ipForward": "True",
+            "ipv4Addr": "none",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "None",
+            "vrf": "eMZ"
+        },
+        {
+            "agw": "True",
+            "description": "none",
+            "id": "2515",
+            "ipForward": "False",
+            "ipv4Addr": "10.35.129.250/23",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "2103",
+            "vrf": "eMZ"
+        },
+        {
+            "agw": "False",
+            "description": "L3_VNI_FOR_eAZ_2010000",
+            "id": "3901",
+            "ipForward": "True",
+            "ipv4Addr": "none",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "None",
+            "vrf": "eAZ"
+        },
+        {
+            "agw": "False",
+            "description": "VRF_eDZ",
+            "id": "3904",
+            "ipForward": "True",
+            "ipv4Addr": "none",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "None",
+            "vrf": "eDZ"
+        },
+        {
+            "agw": "False",
+            "description": "L3_VNI_FOR_eBZ_2070000",
+            "id": "3907",
+            "ipForward": "True",
+            "ipv4Addr": "none",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "None",
+            "vrf": "eBZ"
+        },
+        {
+            "agw": "False",
+            "description": "L3_VNI_FOR_e11Z_2110000",
+            "id": "3911",
+            "ipForward": "True",
+            "ipv4Addr": "none",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "None",
+            "vrf": "e11Z"
+        },
+        {
+            "agw": "False",
+            "description": "L3_VNI_FOR_e25Z_2250000",
+            "id": "3925",
+            "ipForward": "True",
+            "ipv4Addr": "none",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "None",
+            "vrf": "e25Z"
+        },
+        {
+            "agw": "False",
+            "description": "none",
+            "id": "3967",
+            "ipForward": "False",
+            "ipv4Addr": "none",
+            "ipv4Redirect": "False",
+            "mtu": "9216",
+            "state": "Up",
+            "tag": "None",
+            "vrf": "default"
+        }
+    ]
+}

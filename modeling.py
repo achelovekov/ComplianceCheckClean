@@ -133,8 +133,8 @@ def getNodeData(object: Dict, keys: Tuple[Tuple, NonRootKey]):
   return result
 
 def go(object: Dict, rootElement: RootElement, pathIndex: int, candidate: Dict, referenceValues: ReferenceValues):
-  if pathIndex < len(rootElement.path):
-    try:
+  try:
+    if pathIndex < len(rootElement.path):
       if isinstance(object[rootElement.path[pathIndex]], Dict):
         if pathIndex != len(rootElement.path) - 1:
           candidate[rootElement.path[pathIndex]] = {}
@@ -151,8 +151,7 @@ def go(object: Dict, rootElement: RootElement, pathIndex: int, candidate: Dict, 
           else:
             candidate[rootElement.path[pathIndex]] = {}
           return go(item, rootElement, pathIndex + 1, candidate[rootElement.path[pathIndex]], referenceValues)
-    except KeyError as e:
-      pass  
+
     if pathIndex == len(rootElement.path):
       if keys := rootElement.getNodeReference(rootElement.path[pathIndex-1]):
         candidate.update(getNodeData(object, keys))
@@ -160,4 +159,27 @@ def go(object: Dict, rootElement: RootElement, pathIndex: int, candidate: Dict, 
         if len(setReference) > 0:
           referenceValues.setReferenceValue(candidate, setReference)
       return True
+  except KeyError as e:
+    pass
+    #print(f"{e}")
 
+def goRef(object: Dict, rootElement: RootElement, candidate: Dict, referenceValues: ReferenceValues):
+  if rootElement.path:
+    currentNode = rootElement.path[0]
+    if isinstance(object[currentNode], Dict):
+      if keys := rootElement.getNodeReference(currentNode): 
+        candidate[currentNode] = getNodeData(object[currentNode], keys)
+      else:
+        candidate[currentNode] = {}
+      rootElement.path.remove(rootElement.path[0])
+    if isinstance(object[currentNode], List):
+      checkReference, _ = rootElement.rootKeys.getRootData(currentNode)
+      if item := referenceValues.checkObjectByCheckReference(object[currentNode], checkReference):
+        if keys := rootElement.getNodeReference(rootElement.path[0]): 
+          candidate[currentNode] = getNodeData(item, keys)
+        else:
+          candidate[currentNode] = {}
+        rootElement.path.remove(currentNode)
+        return go(item, rootElement, candidate[currentNode], referenceValues)
+  else:
+    pass

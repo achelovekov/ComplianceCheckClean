@@ -1,0 +1,12 @@
+{
+    "serviceName": "L2VNI",
+    "footprintDefinition": "services/footprintDefinitions/L2VNI.json",
+    "streeDefinition": "filename",
+    "ttpTemplates": [
+        "l2BD",
+        "sviIf",
+        "rtctrlBDEvi",
+        "nvoNw_L2"
+    ],
+    "subServices": []
+}

@@ -1,0 +1,41 @@
+[{
+    "serviceName": "L3VNI",
+    "serviceVars": [
+      {
+        "siteID": "014",
+        "siteVars": [
+          {
+            "id": {
+              "type": "direct",
+              "value": "e14Z"
+            },
+            "vni": {
+              "type": "direct",
+              "value": "2140000"
+            },
+            "sviId": {
+              "type": "direct",
+              "value": "3914"
+            },
+            "asNum": {
+              "type": "direct",
+              "value": "65514"
+            },
+            "description": {
+              "type": "relative",
+              "value": "L3_VNI_FOR_${id}_${vni}"
+            },
+            "vrfName": {
+              "type": "relative",
+              "value": "VRF_${id}"
+            },
+            "sourceVar": {
+              "type": "source",
+              "path": "l3Inst/vnid",
+              "value": "${var}_[blabla]_${vrfName}"
+            }
+          }
+        ]
+      }
+    ]
+  }]

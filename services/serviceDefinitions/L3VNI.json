@@ -1,0 +1,13 @@
+{
+    "serviceName": "L3VNI",
+    "footprintDefinition": "services/footprintDefinitions/L3VNI.json",
+    "streeDefinition": "services/streeDefinitions/L3VNI.json",
+    "ttpTemplates": [
+        "l3Inst",
+        "l2BD",
+        "sviIf",
+        "nvoNw_L3",
+        "bgp"
+    ],
+    "subServices": []
+}

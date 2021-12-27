@@ -85,8 +85,8 @@ router bgp {{ asn | DIGIT }}
   </group>
   <group name="bgpL2vpnEvpn">
   address-family l2vpn evpn {{ enabled | set("True") }}
-    nexthop trigger-delay critical {{ delayCritical | DIGIT }} non-critical {{ delayNonCritical | DIGIT }}
-    advertise-pip {{ advertisePip | set("True") }}
+    nexthop trigger-delay critical {{ delayCritical | DIGIT | default("default")}} non-critical {{ delayNonCritical | DIGIT | default("default")}}
+    advertise-pip {{ advertisePip | set("True") | default("False")}}
   </group>
   <group name="templates">
   template peer {{ id }}
@@ -153,22 +153,5 @@ router bgp {{ asn | DIGIT }}
           except xml.etree.ElementTree.ParseError as e:
               logging.error(f"incorrect ttp-template\n{e}\nplease check combined template: {template}")
               exit()
-"""     def parser(cls, filename, chunkNames):
-        try:
-            with open(filename, encoding = 'utf-8') as f:
-                data_to_parse = f.read() 
-
-            template = cls.getCombinedTemplate(chunkNames)
-            try:
-                parser = ttp(data=data_to_parse,template=template)
-                parser.parse()
-                return parser.result(format='raw')[0][0]
-            except xml.etree.ElementTree.ParseError as e:
-                logging.error(f"incorrect ttp-template\n{e}\nplease check combined template: {template}")
-                exit()
-
-        except FileNotFoundError as e:
-            logging.error(f"file {filename} not found")
-            exit() """
       
 

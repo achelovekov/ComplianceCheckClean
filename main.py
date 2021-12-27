@@ -4,64 +4,26 @@ import json
 from modeling import *
 from definition import Service
 import os
-from consistency import consistency
+from consistency import *
+from templating import *
 
-def generateFootprint(service: Service, result: Dict, rawConfig, referenceValues):
-    if service.subServices:
-        for subService in service.subServices:
-            generateFootprint(subService, result, rawConfig, referenceValues)
-    else:
-        parsedData = TTPLib.parser(rawConfig, service.ttpTemplates)
+serviceName = 'L3VNI'
+service = Service.parse_file(f'services/serviceDefinitions/{serviceName}.json')
+sTreeService = STreeService.parse_file(service.streeDefinition)
 
-    if service.footprintDefinition:
-        with open(referenceValues, encoding = 'utf-8') as f:
-            data = f.read()
-            referenceValues = ReferenceValues.parse_raw(data) 
-        
-        with open(service.footprintDefinition, encoding = 'utf-8') as fi:
-            data = fi.read()
-            rootElements = RootElements.parse_raw(data) 
-        
-        candidate = {}
-        for rootElement in rootElements:
-            go(parsedData, rootElement, 0, candidate, referenceValues)
-        result[service.serviceName] = candidate
+rawCollectionConfigs, rawCollectionFootprints, footprintHashSet = consistency(service, 'RawConfigs/Site6')
+data = getVarsFromSoT('dataModel.json', '014', 'L3VNI', 'e14Z')
 
-def parseRawCollection(rawInventoryFolder):
-    devices = [f.name for f in os.scandir(rawInventoryFolder) if f.is_dir()]
-
-    di = {}
-
-    for device in devices:
-        try:
-            with open(f"{rawInventoryFolder}/{device}/{device}-running.txt", encoding = 'utf-8') as f:
-                data = f.read()
-                di[device] = data
-
-        except Exception as e:
-            print(f"{e}")
-            exit()
-    
-    return di
-        
-def processRawCollection(serviceName: str, rawInventoryFolder: str):
-    
-    rawCollection = parseRawCollection(rawInventoryFolder)
-    result = {}
-
-    service = Service.parse_file(f'services/{serviceName}/definition.json')
-
-    for device, rawConfig in rawCollection.items():
-        footprint = {}
-        generateFootprint(service, footprint, rawConfig, 'referenceValues.json')
-        
-        result[device] = footprint
-    return result
-
-result = processRawCollection('VNI', 'RawConfigs/Site2')
-
-re = consistency(result)
-
-for k, v in re.items():
+""" for k, v in footprintHashSet.items():
     print(k, v.devices)
-    print(json.dumps(v.config, sort_keys=True, indent=4))
+    print(json.dumps(v.config, sort_keys=True, indent=4)) """
+
+for device, footprint in rawCollectionFootprints.items():
+    vars = processVariables(data, footprint[serviceName])
+    sTreeServiceProcessed = sTreeService.process(vars)
+    src = genereteStreeOriginal(sTreeServiceProcessed, f"RawConfigs/Site6/{device}/{device}-running.txt")
+    dst = TemplatedAuxilary.generateTemplated(vars, serviceName)
+
+    print(src)
+    print(dst)
+    print("============")

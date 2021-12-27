@@ -3,7 +3,7 @@
     "subServices": [
       {
         "serviceName": "L2VNI",
-        "footprintDefinition": "services/VNI/L2VNI.json",
+        "footprintDefinition": "services/footprintDefinitions/L2VNI.json",
         "streeDefinition": "filename",
         "ttpTemplates": [
           "l2BD",
@@ -15,7 +15,7 @@
       },
       {
         "serviceName": "L3VNI",
-        "footprintDefinition": "services/VNI/L3VNI.json",
+        "footprintDefinition": "services/footprintDefinitions/L3VNI.json",
         "streeDefinition": "filename",
         "ttpTemplates": [
           "l3Inst",
