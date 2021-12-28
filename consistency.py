@@ -6,11 +6,22 @@ from modeling import *
 from definition import Service
 from ttpLib import TTPLib
 import os
+import json
 
 class Item(BaseModel):
     configHash: str
     config: Dict
     devices: List[str]
+
+def checkEmptyFootprint(di):
+    for k in list(di):
+        if not di[k]:
+            del di[k]
+        else:
+            if isinstance(di[k], Dict):
+                checkEmptyFootprint(di[k])
+                if not di[k]:
+                    del di[k]
 
 def candidateGenerate(referenceValues: ReferenceValues, parsedData: Dict, service: Service):
     with open(referenceValues, encoding = 'utf-8') as f:
@@ -24,8 +35,10 @@ def candidateGenerate(referenceValues: ReferenceValues, parsedData: Dict, servic
     candidate = {}
 
     for rootElement in rootElements:
-        go(parsedData, rootElement, 0, candidate, referenceValues)
+        #go(parsedData, rootElement, 0, candidate, referenceValues)
+        goRef(parsedData, rootElement, candidate, referenceValues)
     
+    checkEmptyFootprint(candidate)
     #print(json.dumps(candidate, sort_keys=True, indent=4))
     return candidate
 
@@ -35,7 +48,7 @@ def generateFootprint(service: Service, footprint: Dict, rawConfig, referenceVal
             generateFootprint(subService, footprint, rawConfig, referenceValues)
     else:
         parsedData = TTPLib.parser(rawConfig, service.ttpTemplates)
-        #print(json.dumps(parsedData, sort_keys=True, indent=4))
+        print(json.dumps(parsedData, sort_keys=True, indent=4))
 
     if service.footprintDefinition:
         footprint[service.serviceName] = candidateGenerate(referenceValues, parsedData, service)

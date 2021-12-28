@@ -34,7 +34,7 @@ interface {{ id | contains('Vlan') | resub(old = '^Vlan', new = '') }}
 """
 
     templates['rtctrlBDEvi'] = """
-<group name="rtctrlBDEvi">   
+<group name="rtctrlBDEvi*">   
   vni {{ id | DIGIT }} l2
     rd {{ rd }}
     route-target import {{ rtImport }}
@@ -44,7 +44,7 @@ interface {{ id | contains('Vlan') | resub(old = '^Vlan', new = '') }}
 
     templates['nvoNw_L3'] = """
 interface nve1
-<group name="nvoNw">   
+<group name="nvoNw*">   
   member vni {{ id | DIGIT }} associate-vrf
   {{ mode | set("L3VNI") }} 
 </group>
@@ -52,7 +52,7 @@ interface nve1
 
     templates['nvoNw_L2'] = """
 interface nve1
-<group name="nvoNw">   
+<group name="nvoNw*">   
   member vni {{ id | DIGIT }}
   {{ mode | set("L2VNI") }} 
     supress-arp {{ supressArp | set("True") | default("False") }}
@@ -62,7 +62,7 @@ interface nve1
 """
 
     templates['l3Inst'] = """
-<group name="l3Inst" containsall="vnid">
+<group name="l3Inst*" containsall="vnid">
 vrf context {{ id }}
   vni {{ vnid | DIGIT }}
   rd {{ rd }}   

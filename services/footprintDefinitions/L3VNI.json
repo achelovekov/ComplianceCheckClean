@@ -171,24 +171,6 @@
                 ]
               }
             ]
-          },
-          {
-            "nodeName": "bgp",
-            "rootKeys": [
-              "asn"
-            ],
-            "nonRootKeys": [
-              {
-                "path": [
-                  "bgpL2vpnEvpn"
-                ],
-                "keys": [
-                  "advertisePip",
-                  "delayCritical",
-                  "delayNonCritical"
-                ]
-              }
-            ]
           }
         ]
       }

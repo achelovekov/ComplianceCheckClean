@@ -1,13 +1,10 @@
 
 from re import template
 from ttpLib import TTPLib
-import json
 from modeling import *
 from definition import Service
-import os
 from consistency import *
 from templating import *
-import io
 
 serviceName = 'L3VNI'
 serviceKey = 'eAZ'
@@ -30,7 +27,7 @@ for device, footprint in rawCollectionFootprints.items():
     original = genereteStreeOriginal(sTreeServiceProcessed, rawCollectionConfigs[device])
     templated = TemplatedAuxilary.generateTemplated(vars, serviceName)
 
-    complianceReportItem = ComplianceReportItem(key=serviceKey, original=original, templated=templated, deviceName=device, footprint=rawCollectionFootprints[device][serviceName])
+    complianceReportItem = ComplianceReportItem(key=serviceKey, original=original, templated=templated, deviceName=device, footprint=json.dumps(rawCollectionFootprints[device][serviceName]))
     complianceReport.append(complianceReportItem)
 
 print(complianceReport.json())

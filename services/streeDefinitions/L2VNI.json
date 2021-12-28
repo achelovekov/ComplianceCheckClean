@@ -1,0 +1,36 @@
+[
+    {
+      "prefix": "vlan ${sviId}",
+      "path": "vlan ${sviId}",
+      "filter": [],
+      "bias": 0
+    },
+    {
+      "prefix": "vrf context ${id}",
+      "path": "vrf context ${id}",
+      "filter": [
+        "address-family"
+      ],
+      "bias": 0
+    },    
+    {
+      "prefix": "address-family ipv4 unicast",
+      "path": "vrf context ${id} address-family ipv4 unicast",
+      "filter": [],
+      "bias": 1
+    },
+    {
+      "prefix": "router bgp ${asNum}",
+      "path": "router bgp ${asNum} vrf ${id}",
+      "filter": [
+        "address-family"
+      ],
+      "bias": 0
+    },
+    {
+      "prefix": "address-family ipv4 unicast",
+      "path": "router bgp ${asNum} vrf ${id} address-family ipv4 unicast",
+      "filter": [],
+      "bias": 1
+    }
+  ]

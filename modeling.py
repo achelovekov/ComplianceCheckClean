@@ -1,6 +1,7 @@
 
 from typing import Any, Tuple, List, Dict, Union
 from pydantic import BaseModel
+import json
 
 class NonRootKey(BaseModel):
   path: Tuple
@@ -91,7 +92,7 @@ class ReferenceValues(BaseModel):
     return None
 
 class RootElement(BaseModel):
-  path: Tuple = ()
+  path: List = []
   rootKeys: RootKeys
   nodesReference: List[NodeReference]
 
@@ -124,7 +125,7 @@ def getNodeData(object: Dict, keys: Tuple[Tuple, NonRootKey]):
   result = {}
 
   rootKeys, nonRootKeys = keys[0], keys[1]
-  
+
   for rootKey in rootKeys:
     result[rootKey] = object[rootKey] 
   for nonRootKey in nonRootKeys: 
@@ -166,27 +167,44 @@ def go(object: Dict, rootElement: RootElement, pathIndex: int, candidate: Dict, 
 def goRef(object: Dict, rootElement: RootElement, candidate: Dict, referenceValues: ReferenceValues):
   if rootElement.path:
     currentNode = rootElement.path[0]
+
     if isinstance(object[currentNode], Dict):
       if keys := rootElement.getNodeReference(currentNode): 
         candidate[currentNode] = getNodeData(object[currentNode], keys)
       else:
         candidate[currentNode] = {}
-      rootElement.path.remove(rootElement.path[0])
+
+      if len(rootElement.path) == 1:
+        _, setReference = rootElement.rootKeys.getRootData(currentNode)
+        if len(setReference) > 0:
+          referenceValues.setReferenceValue(candidate, setReference)
+
+      rootElement.path.remove(currentNode)
+      return goRef(object[currentNode], rootElement, candidate[currentNode], referenceValues)
+
     if isinstance(object[currentNode], List):
       checkReference, _ = rootElement.rootKeys.getRootData(currentNode)
+
       if item := referenceValues.checkObjectByCheckReference(object[currentNode], checkReference):
-        if keys := rootElement.getNodeReference(rootElement.path[0]): 
+        if keys := rootElement.getNodeReference(currentNode): 
           candidate[currentNode] = getNodeData(item, keys)
         else:
           candidate[currentNode] = {}
+
+        if len(rootElement.path) == 1:
+          _, setReference = rootElement.rootKeys.getRootData(currentNode)
+          if len(setReference) > 0:
+            referenceValues.setReferenceValue(item, setReference)
+
         rootElement.path.remove(currentNode)
-        return go(item, rootElement, candidate[currentNode], referenceValues)
+        return goRef(item, rootElement, candidate[currentNode], referenceValues)
   else:
     pass
 
+
 class ComplianceReportItem(BaseModel):
     key: str
-    footprint: Dict
+    footprint: str
     original: str
     templated: str
     deviceName: str
