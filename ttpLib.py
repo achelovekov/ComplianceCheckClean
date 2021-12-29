@@ -10,7 +10,7 @@ class TTPLib():
     templates = {}
 
     templates['l2BD'] = """
-<group name="l2BD" containsall="name, accEncap">
+<group name="l2BD*" containsall="name, accEncap">
 vlan {{ id | DIGIT }}
   name {{ name }}
   vn-segment {{ accEncap }}
@@ -108,7 +108,7 @@ router bgp {{ asn | DIGIT }}
   neighbor {{ id | is_ip }}
     inherit peer {{ template }}
   </group>
-  <group name="vrfLite">
+  <group name="vrfLite*">
   vrf {{ id }}
     graceful-restart stalepath-time {{ stalePathTime | DIGIT | default("default") }}
     bestpath as-path multipath-relax {{ multipathRelax | set("True") | default("False") }}

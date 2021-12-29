@@ -11,6 +11,7 @@ class Var(BaseModel):
     value: str  
 
 class SiteVar(BaseModel):
+    serviceType: Optional[Var]
     id: Optional[Var]
     vni: Optional[Var]
     sviId: Optional[Var]

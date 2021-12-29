@@ -148,13 +148,13 @@ def printPath(
 
 if __name__ == "__main__":
 
-    device = 'SKO-DATA-AC-014-H31-01-EXT'
+    device = 'SKO-DATA-AC-014-J22-01-EXT'
 
-    rootNode = stree(f"RawConfigs/Site6/{device}/{device}-running.txt")
+    rootNode = streeFromFile(f"RawConfigs/Site4/{device}/{device}-running.txt")
 
     #print(rootNode.json())
 
-    path = ['router', 'bgp', '65624', 'vrf', 'd48Z']
+    path = ['router', 'bgp', '65514', 'vrf', 'eAZ']
     filter = []
 
     printBuf = printPath(rootNode, path, filter)

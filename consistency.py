@@ -48,7 +48,7 @@ def generateFootprint(service: Service, footprint: Dict, rawConfig, referenceVal
             generateFootprint(subService, footprint, rawConfig, referenceValues)
     else:
         parsedData = TTPLib.parser(rawConfig, service.ttpTemplates)
-        print(json.dumps(parsedData, sort_keys=True, indent=4))
+        #print(json.dumps(parsedData, sort_keys=True, indent=4))
 
     if service.footprintDefinition:
         footprint[service.serviceName] = candidateGenerate(referenceValues, parsedData, service)

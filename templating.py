@@ -20,7 +20,7 @@ def processVariables(data:Dict, originalData:Dict):
         try:
             return getDictValueByPath(data[path[0]], path[1:]) if path else data
         except KeyError as e:
-            return None
+            return "$MUSTEXISTINSOURCEVAR"
 
     def pathTransform(data:str):
         return data.split('/')
@@ -48,10 +48,7 @@ def processVariables(data:Dict, originalData:Dict):
                     mapping[item.group(1)] = getDictValueByPath(originalData, pathTransform(definition['path']))
                 else: 
                     mapping[item.group(1)] = newData[item.group(1)]
-            if mapping['var'] == None:
-                newData[variable] = None
-            else: 
-                newData[variable] = template.substitute(**mapping)
+            newData[variable] = template.substitute(**mapping)
 
     return newData
 
@@ -139,10 +136,31 @@ def genereteStreeOriginal(sTreeServiceProcessed: STreeServiceProcessed, config: 
     return result
 
 
+class ServiceTemplatePerType(BaseModel):
+    serviceName: str
+    serviceType: str
+    serviceTemplate: str
+
+class ServiceTemplatesPerType(BaseModel):
+    __root__: List[ServiceTemplatePerType] = []
+
+    def append(self, serviceTemplatePerType:ServiceTemplatePerType):
+        self.__root__.append(serviceTemplatePerType)
+  
+    def __iter__(self):
+        return iter(self.__root__)
+
+    def __len__(self):
+        return len(self.__root__)
+
 class TemplatedAuxilary():
 
-    templates = dict()
-    templates['L3VNI'] = """
+    serviceTemplatesPerType = ServiceTemplatesPerType()
+
+    serviceTemplatesPerType.append(
+                ServiceTemplatePerType(serviceName='L3VNI',
+                    serviceType='type-1', 
+                    serviceTemplate="""
 vlan {{ vars['sviId'] }}
   name VRF_{{ vars['id'] }}
   vn-segment {{ vars['vni'] }}
@@ -159,9 +177,19 @@ router bgp {{ vars['asNum'] }}
   address-family ipv4 unicast
     redistribute direct route-map RM-REDIST-SUBNET-{{ vars['id'] }}
     maximum-paths ibgp 4
-"""
+"""))
+
+
     @classmethod
-    def generateTemplated(cls, vars: Dict, serviceName: str):
-        j2_inventory_template = jinja2.Template(cls.templates[serviceName])
+    def getTemplateByServiceNameAndType(cls, serviceName: str, serviceType: str) -> str:
+        for item in cls.serviceTemplatesPerType:
+            if item.serviceName == serviceName and item.serviceType == serviceType:
+                return item.serviceTemplate
+        return None
+
+    @classmethod
+    def generateTemplated(cls, vars: Dict, serviceName: str, serviceType: str):
+        template = cls.getTemplateByServiceNameAndType(serviceName, serviceType)
+        j2_inventory_template = jinja2.Template(template)
 
         return j2_inventory_template.render(vars=vars)

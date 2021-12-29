@@ -5,6 +5,10 @@
         "siteID": "014",
         "siteVars": [
           {
+            "serviceType": {
+              "type": "direct",
+              "value": "type-1"
+            },
             "id": {
               "type": "direct",
               "value": "e14Z"
@@ -36,6 +40,10 @@
             }
           },
           {
+            "serviceType": {
+              "type": "direct",
+              "value": "type-1"
+            },
             "id": {
               "type": "direct",
               "value": "eAZ"
