@@ -19,6 +19,7 @@ class SiteVar(BaseModel):
     description: Optional[Var]
     vrfName: Optional[Var]
     sourceVar: Optional[Var]
+    redistributeDirectRMap: Optional[Var]
 
 class ServiceVar(BaseModel):
     siteID: str

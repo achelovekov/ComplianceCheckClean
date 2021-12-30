@@ -109,7 +109,7 @@ def printNode(node:Node, depth, step, tmpStr, buf, filter):
         print(f"may be wrong path? {e}")
         exit()
 
-def streeFromFile(filename):
+def streeFromFile(filename) -> Node:
     rootNode = Node(name='root')
     roots = {0: rootNode}
     lG = linesGeneratorFromFile(filename)
@@ -120,7 +120,7 @@ def streeFromFile(filename):
 
     return rootNode
 
-def streeFromConfig(config):
+def streeFromConfig(config) -> Node:
     rootNode = Node(name='root')
     roots = {0: rootNode}
     lG = linesGeneratorFromConfig(config)
@@ -148,13 +148,17 @@ def printPath(
 
 if __name__ == "__main__":
 
-    device = 'SKO-DATA-AC-014-J22-01-EXT'
+    device = 'ACOD-PROD-LF10-1'
 
-    rootNode = streeFromFile(f"RawConfigs/Site4/{device}/{device}-running.txt")
+    rootNode = streeFromFile(f"RawConfigs/tmpTest/{device}/{device}-running.txt")
 
     #print(rootNode.json())
 
-    path = ['router', 'bgp', '65514', 'vrf', 'eAZ']
+    path = [
+        "vrf",
+        "context",
+        "PROD-SRV-APP"
+      ]
     filter = []
 
     printBuf = printPath(rootNode, path, filter)

@@ -24,10 +24,6 @@ def checkEmptyFootprint(di):
                     del di[k]
 
 def candidateGenerate(referenceValues: ReferenceValues, parsedData: Dict, service: Service):
-    with open(referenceValues, encoding = 'utf-8') as f:
-        data = f.read()
-        referenceValues = ReferenceValues.parse_raw(data) 
-        
     with open(service.footprintDefinition, encoding = 'utf-8') as fi:
         data = fi.read()
         rootElements = RootElements.parse_raw(data) 
@@ -48,7 +44,7 @@ def generateFootprint(service: Service, footprint: Dict, rawConfig, referenceVal
             generateFootprint(subService, footprint, rawConfig, referenceValues)
     else:
         parsedData = TTPLib.parser(rawConfig, service.ttpTemplates)
-        #print(json.dumps(parsedData, sort_keys=True, indent=4))
+        print(json.dumps(parsedData, sort_keys=True, indent=4))
 
     if service.footprintDefinition:
         footprint[service.serviceName] = candidateGenerate(referenceValues, parsedData, service)
@@ -70,21 +66,25 @@ def parseRawCollection(rawInventoryFolder: str) -> Dict:
     
     return rawCollection
         
-def processRawCollection(service: Service, rawInventoryFolder: str) -> Tuple[Dict, Dict]:
+def processRawCollection(service: Service, rawInventoryFolder: str, referenceValues: ReferenceValues) -> Tuple[Dict, Dict]:
     
     rawCollectionConfigs = parseRawCollection(rawInventoryFolder)
     rawCollectionFootprints = {}
 
     for device, rawConfig in rawCollectionConfigs.items():
         footprint = {}
-        generateFootprint(service, footprint, rawConfig, 'referenceValues.json')
+        generateFootprint(service, footprint, rawConfig, referenceValues)
         #print(json.dumps(footprint, sort_keys=True, indent=4))
         rawCollectionFootprints[device] = footprint
     return (rawCollectionConfigs, rawCollectionFootprints)
 
-def consistency(service: Service, rawInventoryFolder: str) -> Tuple[Dict, Dict, Dict]:
+def consistency(service: Service, rawInventoryFolder: str, referenceValuesFilename: str) -> Tuple[Dict, Dict, Dict]:
 
-    rawCollectionConfigs, rawCollectionFootprints = processRawCollection(service, rawInventoryFolder)
+    with open(referenceValuesFilename, encoding = 'utf-8') as f:
+        data = f.read()
+        referenceValues = ReferenceValues.parse_raw(data) 
+
+    rawCollectionConfigs, rawCollectionFootprints = processRawCollection(service, rawInventoryFolder, referenceValues)
 
     footprintHashSet = {}
     for device, config in rawCollectionFootprints.items():

@@ -66,12 +66,14 @@ interface nve1
 vrf context {{ id }}
   vni {{ vnid | DIGIT }}
   rd {{ rd }}   
-  <group name="ipv4Afi" containsall="rtImportEvpn, rtExportEvpn">
+  <group name="ipv4Afi" >
   address-family ipv4 unicast {{ _start_ }}{{ _exact_ }}
     route-target import {{ rtImport }}
     route-target export {{ rtExport }}
     route-target import {{ rtImportEvpn }} evpn
     route-target export {{ rtExportEvpn }} evpn
+    route-target both auto {{ rtImport | set("auto") }} {{ rtExport | set("auto") }}
+    route-target both auto evpn {{ rtImportEvpn | set("auto") }} {{ rtExportEvpn | set("auto") }}
   </group>
 </group>
 """
@@ -116,7 +118,7 @@ router bgp {{ asn | DIGIT }}
     address-family ipv4 unicast {{ enabled | set("True") }}
       redistribute direct route-map {{ redistributeDirectRMap }}
       redistribute static route-map {{ redistributeStaticRMap }}
-      maximum-paths ibgp {{ ibgpMaxPath | DIGIT }}
+      maximum-paths ibgp {{ ibgpMaxPath | DIGIT | default("default") }}
     </group>
     <group name="neighbors">
     neighbor {{ id | is_ip }}

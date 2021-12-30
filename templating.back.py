@@ -1,5 +1,5 @@
 import yaml
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 import re 
 from string import Template
 import json
@@ -54,11 +54,9 @@ def processVariables(data:Dict, originalData:Dict):
 
 class STreeServiceProcessedItem(BaseModel):
     prefix: str = ''
-    path: Optional[List[str]] = []
-    filter: Optional[List[str]] = []
-    parent: Optional['STreeServiceProcessedItem']
-
-STreeServiceProcessedItem.update_forward_refs()
+    path: List[str] = []
+    filter: List[str] = []
+    bias: int = 0
 
 class STreeServiceProcessed(BaseModel):
     __root__: List[STreeServiceProcessedItem] = []
@@ -74,11 +72,9 @@ class STreeServiceProcessed(BaseModel):
 
 class STreeServiceItem(BaseModel):
     prefix: str
-    path: Optional[str]
-    filter: Optional[List[str]]
-    parent: Optional['STreeServiceItem']
-
-STreeServiceItem.update_forward_refs()
+    path: str
+    filter: List[str]
+    bias: int
 
 class STreeService(BaseModel):
     __root__: List[STreeServiceItem] = []
@@ -89,101 +85,56 @@ class STreeService(BaseModel):
     def __iter__(self):
         return iter(self.__root__)
 
-    def processString(self, src, regex, vars):
-        try:
-            mapping = {}
-            template = Template(src)
-            for item in re.finditer(regex, src):
-                mapping[item.group(1)] = vars[item.group(1)]
-
-            return template.substitute(**mapping)
-        except KeyError as e:
-            print(f"{e}. Please check the vars definitions")
-
-    def processItem(self, sTreeServiceItem: STreeServiceItem, regex: str, vars: Dict):
-        sTreeServiceProcessedItem = STreeServiceProcessedItem()
-        sTreeServiceProcessedItem.prefix = self.processString(sTreeServiceItem.prefix, regex, vars)
-        if sTreeServiceItem.path:  
-            sTreeServiceProcessedItem.path = self.processString(sTreeServiceItem.path, regex, vars).split()
-        if sTreeServiceItem.filter: 
-            sTreeServiceProcessedItem.filter = sTreeServiceItem.filter
-
-        if sTreeServiceItem.parent:
-            sTreeServiceProcessedItem.parent = self.processItem(sTreeServiceItem.parent, regex, vars)
-        
-        return sTreeServiceProcessedItem
-
     def process(self, vars):
         regex = '\${([a-zA-Z]+)}'
+
+        def processString(src, regex):
+            try:
+                mapping = {}
+                template = Template(src)
+                for item in re.finditer(regex, src):
+                    mapping[item.group(1)] = vars[item.group(1)]
+
+                return template.substitute(**mapping)
+            except KeyError as e:
+                print(f"{e}. Please check the vars definitions")
         sTreeServiceProcessed = STreeServiceProcessed()
 
         for sTreeServiceItem in self:
-            sTreeServiceProcessedItem = self.processItem(sTreeServiceItem, regex, vars)
+            sTreeServiceProcessedItem = STreeServiceProcessedItem()
+           
+            sTreeServiceProcessedItem.prefix = processString(sTreeServiceItem.prefix, regex)
+            sTreeServiceProcessedItem.path = processString(sTreeServiceItem.path, regex).split()
+            sTreeServiceProcessedItem.filter = sTreeServiceItem.filter
+            sTreeServiceProcessedItem.bias = sTreeServiceItem.bias
+
             sTreeServiceProcessed.append(sTreeServiceProcessedItem)
             
         return sTreeServiceProcessed
 
-class PrintedStreeItem(BaseModel):
-    prefix: str
-    content: List[str] = None
-    parent: Optional['PrintedStreeItem'] = None
-
-PrintedStreeItem.update_forward_refs()
-
-def processItem(rootNode: Node, sTreeServiceProcessedItem: STreeServiceProcessedItem, nonEmpty: bool) -> PrintedStreeItem:
-
-    if sTreeServiceProcessedItem.path:
-        printBuf = printPath(rootNode, sTreeServiceProcessedItem.path, sTreeServiceProcessedItem.filter)
-    else:
-        printBuf = []
-
-    if printBuf:
-        nonEmpty = nonEmpty or True
-    
-    if nonEmpty:
-
-        printedStreeItem = PrintedStreeItem(prefix=sTreeServiceProcessedItem.prefix, content=printBuf)
-
-        if sTreeServiceProcessedItem.parent:
-            printedStreeItem.parent = processItem(rootNode, sTreeServiceProcessedItem.parent, nonEmpty)
-        
-        return printedStreeItem 
-
-def indentList(li: List):
-    for index, item in enumerate(li):
-        li[index] = "  " + item
-
-def printItemPart(bias: bool, printedStreeItem: PrintedStreeItem, buf: List):
+def indentBlock(step:int, bias:int, prefix:str, block:str):
     res = []
-    res.append(printedStreeItem.prefix)
-
-    for line in printedStreeItem.content:
+    prefix = " "*step*bias + prefix
+    res.append(prefix)
+    for line in block:
+        line = " "*step*bias + line
         res.append(line)
+    return '\n'.join(res)
 
-    buf[:0] = res
-    if bias:
-        indentList(buf)
+def genereteStreeOriginal(sTreeServiceProcessed: STreeServiceProcessed, config: str):
+        
+    rootNode = streeFromConfig(config)
 
-def printItem(printedStreeItem: PrintedStreeItem, buf: str):
-    if printedStreeItem.parent:
-        bias = True
-    else:
-        bias = False
-    
-    printItemPart(bias, printedStreeItem, buf)
+    result = ''
+    for index, sTreeServiceProcessedItem in enumerate(sTreeServiceProcessed):
+        printBuf = printPath(rootNode, sTreeServiceProcessedItem.path, sTreeServiceProcessedItem.filter)
+        #if printBuf:
+        result += indentBlock(2, sTreeServiceProcessedItem.bias, sTreeServiceProcessedItem.prefix, printBuf)
+        if index != len(sTreeServiceProcessed) - 1:
+            result += '\n'
 
-    if printedStreeItem.parent:
-        printItem(printedStreeItem.parent, buf)
+    return result
 
-def genereteStreeOriginal(sTreeServiceProcessed: STreeServiceProcessed, rootNode: Node, result: List):
-
-    for _, sTreeServiceProcessedItem in enumerate(sTreeServiceProcessed):
-        nonEmpty = False
-        printedStreeItem = processItem(rootNode, sTreeServiceProcessedItem, nonEmpty) 
-        if printedStreeItem: 
-            buf = []    
-            printItem(printedStreeItem, buf)
-            result.extend(buf)
 
 class ServiceTemplatePerType(BaseModel):
     serviceName: str

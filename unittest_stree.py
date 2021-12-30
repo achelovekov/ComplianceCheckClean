@@ -1,5 +1,5 @@
 
-from re import template
+
 from ttpLib import TTPLib
 from modeling import *
 from definition import Service
@@ -11,12 +11,14 @@ serviceKey = 'PROD-SRV-APP'
 service = Service.parse_file(f'services/serviceDefinitions/{serviceName}.json')
 sTreeService = STreeService.parse_file(service.streeDefinition)
 
-rawCollectionConfigs, rawCollectionFootprints, footprintHashSet = consistency(service, 'RawConfigs/tmp', 'referenceValues.json')
+print(sTreeService)
 
-for k, v in footprintHashSet.items():
+rawCollectionConfigs, rawCollectionFootprints, footprintHashSet = consistency(service, 'RawConfigs/tmpTest', 'referenceValues.json')
+
+""" for k, v in footprintHashSet.items():
     print(k)
     print(v.devices)
-    print(json.dumps(v.config, sort_keys=True, indent=4))
+    print(json.dumps(v.config, sort_keys=True, indent=4)) """
 
 varsFromSot = getVarsFromSoT('dataModel.json', '014', serviceName, serviceKey)
 serviceType = varsFromSot['serviceType']['value']
@@ -32,10 +34,5 @@ for device, footprint in rawCollectionFootprints.items():
     sTreeServiceProcessed = sTreeService.process(vars)
     rootNode = streeFromConfig(rawCollectionConfigs[device])
     result = []
-    templated = TemplatedAuxilary.generateTemplated(vars, serviceName, serviceType)
     genereteStreeOriginal(sTreeServiceProcessed, rootNode, result)
-    original = '\n'.join(result)
-    complianceReportItem = ComplianceReportItem(key=serviceKey, original=original, templated=templated, deviceName=device, footprint=json.dumps(rawCollectionFootprints[device][serviceName]))
-    complianceReport.append(complianceReportItem)
-
-print(complianceReport.json())
+    print('\n'.join(result))
