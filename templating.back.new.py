@@ -53,9 +53,10 @@ def processVariables(data:Dict, originalData:Dict):
     return newData
 
 class STreeServiceProcessedItem(BaseModel):
-    path: List[str] = []
-    filter: List[str] = []
-    children: Optional[List['STreeServiceProcessedItem']] = []
+    prefix: str = ''
+    path: Optional[List[str]] = []
+    filter: Optional[List[str]] = []
+    parent: Optional['STreeServiceProcessedItem']
 
 STreeServiceProcessedItem.update_forward_refs()
 
@@ -72,9 +73,10 @@ class STreeServiceProcessed(BaseModel):
         return len(self.__root__)
 
 class STreeServiceItem(BaseModel):
-    path: str
-    filter: List[str]
-    children: Optional[List['STreeServiceItem']]
+    prefix: str
+    path: Optional[str]
+    filter: Optional[List[str]]
+    parent: Optional['STreeServiceItem']
 
 STreeServiceItem.update_forward_refs()
 
@@ -100,13 +102,14 @@ class STreeService(BaseModel):
 
     def processItem(self, sTreeServiceItem: STreeServiceItem, regex: str, vars: Dict):
         sTreeServiceProcessedItem = STreeServiceProcessedItem()
-        sTreeServiceProcessedItem.path = self.processString(sTreeServiceItem.path, regex, vars).split()
+        sTreeServiceProcessedItem.prefix = self.processString(sTreeServiceItem.prefix, regex, vars)
+        if sTreeServiceItem.path:  
+            sTreeServiceProcessedItem.path = self.processString(sTreeServiceItem.path, regex, vars).split()
+        if sTreeServiceItem.filter: 
+            sTreeServiceProcessedItem.filter = sTreeServiceItem.filter
 
-        sTreeServiceProcessedItem.filter = sTreeServiceItem.filter
-
-        if sTreeServiceItem.children:
-            for child in sTreeServiceItem.children:
-                sTreeServiceProcessedItem.children.append(self.processItem(child, regex, vars))
+        if sTreeServiceItem.parent:
+            sTreeServiceProcessedItem.parent = self.processItem(sTreeServiceItem.parent, regex, vars)
         
         return sTreeServiceProcessedItem
 
@@ -123,45 +126,64 @@ class STreeService(BaseModel):
 class PrintedStreeItem(BaseModel):
     prefix: str
     content: List[str] = None
-    children: Optional[List['PrintedStreeItem']] = []
+    parent: Optional['PrintedStreeItem'] = None
 
 PrintedStreeItem.update_forward_refs()
 
-def printItem(prefix: str, content: List, bias: int):
-    res = []
-    prefix = " "*2*bias + ' '.join(prefix)
-    res.append(prefix)
-    for line in content:
-        line = " "*2*bias + line
-        res.append(line)
-    return '\n'.join(res)
+def processItem(rootNode: Node, sTreeServiceProcessedItem: STreeServiceProcessedItem, nonEmpty: bool) -> PrintedStreeItem:
 
-def processItem(rootNode: Node, sTreeServiceProcessedItem: STreeServiceProcessedItem, bias: int, path: List, buf: List[str], indicator: Dict) -> PrintedStreeItem:
-    path = path + sTreeServiceProcessedItem.path
-    if sTreeServiceProcessedItem.filter == ["all"]:
-        printBuf = []
+    if sTreeServiceProcessedItem.path:
+        printBuf = printPath(rootNode, sTreeServiceProcessedItem.path, sTreeServiceProcessedItem.filter)
     else:
-        printBuf = printPath(rootNode, path, sTreeServiceProcessedItem.filter)
+        printBuf = []
+
+    if printBuf:
+        nonEmpty = nonEmpty or True
     
-    if sTreeServiceProcessedItem.children or printBuf:
-        buf.append(printItem(sTreeServiceProcessedItem.path, printBuf, bias))
+    if nonEmpty:
 
-    if sTreeServiceProcessedItem.children:
-        for child in sTreeServiceProcessedItem.children:
-            processItem(rootNode, child, bias+1, path, buf, indicator)
-    if printBuf and not sTreeServiceProcessedItem.children:
-        indicator['hasResult'] = True
+        printedStreeItem = PrintedStreeItem(prefix=sTreeServiceProcessedItem.prefix, content=printBuf)
 
-def genereteStreeOriginal(sTreeServiceProcessed: STreeServiceProcessed, rootNode: Node, result: List[str]):
+        if sTreeServiceProcessedItem.parent:
+            printedStreeItem.parent = processItem(rootNode, sTreeServiceProcessedItem.parent, nonEmpty)
+        
+        return printedStreeItem 
+
+def indentList(li: List):
+    for index, item in enumerate(li):
+        li[index] = "  " + item
+
+def printItemPart(bias: bool, printedStreeItem: PrintedStreeItem, buf: List):
+    res = []
+    res.append(printedStreeItem.prefix)
+
+    for line in printedStreeItem.content:
+        res.append(line)
+
+    buf[:0] = res
+    if bias:
+        indentList(buf)
+
+def printItem(printedStreeItem: PrintedStreeItem, buf: str):
+    if printedStreeItem.parent:
+        bias = True
+    else:
+        bias = False
+    
+    printItemPart(bias, printedStreeItem, buf)
+
+    if printedStreeItem.parent:
+        printItem(printedStreeItem.parent, buf)
+
+def genereteStreeOriginal(sTreeServiceProcessed: STreeServiceProcessed, rootNode: Node, result: List):
 
     for _, sTreeServiceProcessedItem in enumerate(sTreeServiceProcessed):
-        bias = 0
-        path = []
-        indicator = {'hasResult': False}
-        buf = []
-        processItem(rootNode, sTreeServiceProcessedItem, bias, path, buf, indicator)
-        if indicator['hasResult']:
-            result.append('\n'.join(buf))
+        nonEmpty = False
+        printedStreeItem = processItem(rootNode, sTreeServiceProcessedItem, nonEmpty) 
+        if printedStreeItem: 
+            buf = []    
+            printItem(printedStreeItem, buf)
+            result.extend(buf)
 
 class ServiceTemplatePerType(BaseModel):
     serviceName: str

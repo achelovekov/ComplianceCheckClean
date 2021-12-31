@@ -1,5 +1,5 @@
 import yaml
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List
 import re 
 from string import Template
 import json
@@ -53,11 +53,10 @@ def processVariables(data:Dict, originalData:Dict):
     return newData
 
 class STreeServiceProcessedItem(BaseModel):
+    prefix: str = ''
     path: List[str] = []
     filter: List[str] = []
-    children: Optional[List['STreeServiceProcessedItem']] = []
-
-STreeServiceProcessedItem.update_forward_refs()
+    bias: int = 0
 
 class STreeServiceProcessed(BaseModel):
     __root__: List[STreeServiceProcessedItem] = []
@@ -72,11 +71,10 @@ class STreeServiceProcessed(BaseModel):
         return len(self.__root__)
 
 class STreeServiceItem(BaseModel):
+    prefix: str
     path: str
     filter: List[str]
-    children: Optional[List['STreeServiceItem']]
-
-STreeServiceItem.update_forward_refs()
+    bias: int
 
 class STreeService(BaseModel):
     __root__: List[STreeServiceItem] = []
@@ -87,81 +85,56 @@ class STreeService(BaseModel):
     def __iter__(self):
         return iter(self.__root__)
 
-    def processString(self, src, regex, vars):
-        try:
-            mapping = {}
-            template = Template(src)
-            for item in re.finditer(regex, src):
-                mapping[item.group(1)] = vars[item.group(1)]
-
-            return template.substitute(**mapping)
-        except KeyError as e:
-            print(f"{e}. Please check the vars definitions")
-
-    def processItem(self, sTreeServiceItem: STreeServiceItem, regex: str, vars: Dict):
-        sTreeServiceProcessedItem = STreeServiceProcessedItem()
-        sTreeServiceProcessedItem.path = self.processString(sTreeServiceItem.path, regex, vars).split()
-
-        sTreeServiceProcessedItem.filter = sTreeServiceItem.filter
-
-        if sTreeServiceItem.children:
-            for child in sTreeServiceItem.children:
-                sTreeServiceProcessedItem.children.append(self.processItem(child, regex, vars))
-        
-        return sTreeServiceProcessedItem
-
     def process(self, vars):
         regex = '\${([a-zA-Z]+)}'
+
+        def processString(src, regex):
+            try:
+                mapping = {}
+                template = Template(src)
+                for item in re.finditer(regex, src):
+                    mapping[item.group(1)] = vars[item.group(1)]
+
+                return template.substitute(**mapping)
+            except KeyError as e:
+                print(f"{e}. Please check the vars definitions")
         sTreeServiceProcessed = STreeServiceProcessed()
 
         for sTreeServiceItem in self:
-            sTreeServiceProcessedItem = self.processItem(sTreeServiceItem, regex, vars)
+            sTreeServiceProcessedItem = STreeServiceProcessedItem()
+           
+            sTreeServiceProcessedItem.prefix = processString(sTreeServiceItem.prefix, regex)
+            sTreeServiceProcessedItem.path = processString(sTreeServiceItem.path, regex).split()
+            sTreeServiceProcessedItem.filter = sTreeServiceItem.filter
+            sTreeServiceProcessedItem.bias = sTreeServiceItem.bias
+
             sTreeServiceProcessed.append(sTreeServiceProcessedItem)
             
         return sTreeServiceProcessed
 
-class PrintedStreeItem(BaseModel):
-    prefix: str
-    content: List[str] = None
-    children: Optional[List['PrintedStreeItem']] = []
-
-PrintedStreeItem.update_forward_refs()
-
-def printItem(prefix: str, content: List, bias: int):
+def indentBlock(step:int, bias:int, prefix:str, block:str):
     res = []
-    prefix = " "*2*bias + ' '.join(prefix)
+    prefix = " "*step*bias + prefix
     res.append(prefix)
-    for line in content:
-        line = " "*2*bias + line
+    for line in block:
+        line = " "*step*bias + line
         res.append(line)
     return '\n'.join(res)
 
-def processItem(rootNode: Node, sTreeServiceProcessedItem: STreeServiceProcessedItem, bias: int, path: List, buf: List[str], indicator: Dict) -> PrintedStreeItem:
-    path = path + sTreeServiceProcessedItem.path
-    if sTreeServiceProcessedItem.filter == ["all"]:
-        printBuf = []
-    else:
-        printBuf = printPath(rootNode, path, sTreeServiceProcessedItem.filter)
-    
-    if sTreeServiceProcessedItem.children or printBuf:
-        buf.append(printItem(sTreeServiceProcessedItem.path, printBuf, bias))
+def genereteStreeOriginal(sTreeServiceProcessed: STreeServiceProcessed, config: str):
+        
+    rootNode = streeFromConfig(config)
 
-    if sTreeServiceProcessedItem.children:
-        for child in sTreeServiceProcessedItem.children:
-            processItem(rootNode, child, bias+1, path, buf, indicator)
-    if printBuf and not sTreeServiceProcessedItem.children:
-        indicator['hasResult'] = True
+    result = ''
+    for index, sTreeServiceProcessedItem in enumerate(sTreeServiceProcessed):
+        printBuf = printPath(rootNode, sTreeServiceProcessedItem.path, sTreeServiceProcessedItem.filter)
+        #if printBuf:
+        result += indentBlock(2, sTreeServiceProcessedItem.bias, sTreeServiceProcessedItem.prefix, printBuf)
+        if index != len(sTreeServiceProcessed) - 1:
+            result += '\n'
 
-def genereteStreeOriginal(sTreeServiceProcessed: STreeServiceProcessed, rootNode: Node, result: List[str]):
+    return result
 
-    for _, sTreeServiceProcessedItem in enumerate(sTreeServiceProcessed):
-        bias = 0
-        path = []
-        indicator = {'hasResult': False}
-        buf = []
-        processItem(rootNode, sTreeServiceProcessedItem, bias, path, buf, indicator)
-        if indicator['hasResult']:
-            result.append('\n'.join(buf))
 
 class ServiceTemplatePerType(BaseModel):
     serviceName: str
