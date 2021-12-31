@@ -120,13 +120,6 @@ class STreeService(BaseModel):
             
         return sTreeServiceProcessed
 
-class PrintedStreeItem(BaseModel):
-    prefix: str
-    content: List[str] = None
-    children: Optional[List['PrintedStreeItem']] = []
-
-PrintedStreeItem.update_forward_refs()
-
 def printItem(prefix: str, content: List, bias: int):
     res = []
     prefix = " "*2*bias + ' '.join(prefix)
@@ -136,7 +129,7 @@ def printItem(prefix: str, content: List, bias: int):
         res.append(line)
     return '\n'.join(res)
 
-def processItem(rootNode: Node, sTreeServiceProcessedItem: STreeServiceProcessedItem, bias: int, path: List, buf: List[str], indicator: Dict) -> PrintedStreeItem:
+def processItem(rootNode: Node, sTreeServiceProcessedItem: STreeServiceProcessedItem, bias: int, path: List, buf: List[str], indicator: Dict):
     path = path + sTreeServiceProcessedItem.path
     if sTreeServiceProcessedItem.filter == ["all"]:
         printBuf = []
@@ -149,7 +142,7 @@ def processItem(rootNode: Node, sTreeServiceProcessedItem: STreeServiceProcessed
     if sTreeServiceProcessedItem.children:
         for child in sTreeServiceProcessedItem.children:
             processItem(rootNode, child, bias+1, path, buf, indicator)
-    if printBuf and not sTreeServiceProcessedItem.children:
+    if printBuf:
         indicator['hasResult'] = True
 
 def genereteStreeOriginal(sTreeServiceProcessed: STreeServiceProcessed, rootNode: Node, result: List[str]):
