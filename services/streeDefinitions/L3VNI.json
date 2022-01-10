@@ -24,7 +24,8 @@
       {
         "path": "vrf ${id}",
         "filter": [
-          "address-family"
+          "address-family",
+          "neighbor"
         ],
         "children": [
           {

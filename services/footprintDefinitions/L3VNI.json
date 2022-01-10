@@ -157,7 +157,8 @@
             "rootKeys": [
               "id",
               "multipathRelax",
-              "stalePathTime"
+              "stalePathTime",
+              "routerId"
             ],
             "nonRootKeys": [
               {

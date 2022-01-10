@@ -20,6 +20,9 @@ class SiteVar(BaseModel):
     vrfName: Optional[Var]
     sourceVar: Optional[Var]
     redistributeDirectRMap: Optional[Var]
+    stalePathTime: Optional[Var]
+    multipathRelax: Optional[Var]
+    routerId: Optional[Var]
 
 class ServiceVar(BaseModel):
     siteID: str

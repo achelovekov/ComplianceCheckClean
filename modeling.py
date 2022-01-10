@@ -114,8 +114,11 @@ class RootElements(BaseModel):
 
 def getNodeNestedData(object: Dict, keyIndex: int, key: NonRootKey, result: Dict):
   if keyIndex == len(key.path):
-    for key in key.keys:
-      result[key] = object[key]
+    try:
+      for key in key.keys:
+        result[key] = object[key]
+    except (TypeError, KeyError) as e:
+      print(f"{e} with key: {key} result: {result} object: {object}")
     return
   if keyIndex < len(key.path):
     result[key.path[keyIndex]] = {}
@@ -168,36 +171,37 @@ def goRef(object: Dict, rootElement: RootElement, candidate: Dict, referenceValu
   if rootElement.path:
     currentNode = rootElement.path[0]
 
-    if isinstance(object[currentNode], Dict):
-      if keys := rootElement.getNodeReference(currentNode): 
-        candidate[currentNode] = getNodeData(object[currentNode], keys)
-      else:
-        candidate[currentNode] = {}
-
-      if len(rootElement.path) == 1:
-        _, setReference = rootElement.rootKeys.getRootData(currentNode)
-        if len(setReference) > 0:
-          referenceValues.setReferenceValue(candidate, setReference)
-
-      rootElement.path.remove(currentNode)
-      return goRef(object[currentNode], rootElement, candidate[currentNode], referenceValues)
-
-    if isinstance(object[currentNode], List):
-      checkReference, _ = rootElement.rootKeys.getRootData(currentNode)
-
-      if item := referenceValues.checkObjectByCheckReference(object[currentNode], checkReference):
+    if currentNode in object:
+      if isinstance(object[currentNode], Dict):
         if keys := rootElement.getNodeReference(currentNode): 
-          candidate[currentNode] = getNodeData(item, keys)
+          candidate[currentNode] = getNodeData(object[currentNode], keys)
         else:
           candidate[currentNode] = {}
 
         if len(rootElement.path) == 1:
           _, setReference = rootElement.rootKeys.getRootData(currentNode)
           if len(setReference) > 0:
-            referenceValues.setReferenceValue(item, setReference)
+            referenceValues.setReferenceValue(candidate, setReference)
 
         rootElement.path.remove(currentNode)
-        return goRef(item, rootElement, candidate[currentNode], referenceValues)
+        return goRef(object[currentNode], rootElement, candidate[currentNode], referenceValues)
+
+      if isinstance(object[currentNode], List):
+        checkReference, _ = rootElement.rootKeys.getRootData(currentNode)
+
+        if item := referenceValues.checkObjectByCheckReference(object[currentNode], checkReference):
+          if keys := rootElement.getNodeReference(currentNode): 
+            candidate[currentNode] = getNodeData(item, keys)
+          else:
+            candidate[currentNode] = {}
+
+          if len(rootElement.path) == 1:
+            _, setReference = rootElement.rootKeys.getRootData(currentNode)
+            if len(setReference) > 0:
+              referenceValues.setReferenceValue(item, setReference)
+
+          rootElement.path.remove(currentNode)
+          return goRef(item, rootElement, candidate[currentNode], referenceValues)
   else:
     pass
 

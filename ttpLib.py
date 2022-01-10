@@ -62,11 +62,11 @@ interface nve1
 """
 
     templates['l3Inst'] = """
-<group name="l3Inst*" containsall="vnid">
+<group name="l3Inst*">
 vrf context {{ id }}
   vni {{ vnid | DIGIT }}
   rd {{ rd }}   
-  <group name="ipv4Afi" >
+  <group name="ipv4Afi**" >
   address-family ipv4 unicast {{ _start_ }}{{ _exact_ }}
     route-target import {{ rtImport }}
     route-target export {{ rtExport }}
@@ -112,6 +112,7 @@ router bgp {{ asn | DIGIT }}
   </group>
   <group name="vrfLite*">
   vrf {{ id }}
+    router-id {{ routerId | default("none") }}
     graceful-restart stalepath-time {{ stalePathTime | DIGIT | default("default") }}
     bestpath as-path multipath-relax {{ multipathRelax | set("True") | default("False") }}
     <group name="vrfIpv4Unicast">
@@ -132,6 +133,26 @@ router bgp {{ asn | DIGIT }}
   </group>
 </group>
 """
+
+    templates['routeMap'] = """
+<group name="routeMap">
+route-map {{ id }} permit {{ seq }} 
+  {{ deny | set("False") }}
+  {{ permit | set("True") }}
+  match ip address prefix-list {{ matchPrefixList}}
+  match tag {{ matchTag }}
+</group>
+
+<group name="routeMap">
+route-map {{ id }} deny {{ seq }}
+  {{ deny | set("True") }}
+  {{ permit | set("False") }}
+  match ip address prefix-list {{ prefixList}}
+  match tag {{ tag }}
+</group>
+"""
+
+
     @classmethod
     def getCombinedTemplate(cls, chunkNames):
         template = ""

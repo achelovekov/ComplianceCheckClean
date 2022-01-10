@@ -32,7 +32,6 @@ complianceReport = ComplianceReport()
 for device, footprint in rawCollectionFootprints.items():
     vars = processVariables(varsFromSot, footprint[serviceName])
     sTreeServiceProcessed = sTreeService.process(vars)
-    print(sTreeServiceProcessed.json())
     rootNode = streeFromConfig(rawCollectionConfigs[device])
     result = []
     genereteStreeOriginal(sTreeServiceProcessed, rootNode, result)

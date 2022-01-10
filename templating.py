@@ -28,27 +28,30 @@ def processVariables(data:Dict, originalData:Dict):
     newData = {}
     regex = '\${([a-zA-Z]+)}'
     for variable, definition in data.items():
-        if definition['type'] == 'direct' and 'value' in definition:
-            newData[variable] = definition['value'] 
-        if definition['type'] == 'direct' and 'values' in definition:
-            newData[variable] = li = []
-            for value in definition['values']:
-                li.append(value)
-        if definition['type'] == 'relative':
-            mapping = {}
-            template = Template(definition['value'])
-            for item in re.finditer(regex, definition['value']):
-                mapping[item.group(1)] = newData[item.group(1)]
-            newData[variable] = template.substitute(**mapping)
-        if definition['type'] == 'source':
-            template = Template(definition['value'])
-            mapping = {}
-            for item in re.finditer(regex, definition['value']):
-                if item.group(1) == 'var':
-                    mapping[item.group(1)] = getDictValueByPath(originalData, pathTransform(definition['path']))
-                else: 
+        try:
+            if definition['type'] == 'direct' and 'value' in definition:
+                newData[variable] = definition['value'] 
+            if definition['type'] == 'direct' and 'values' in definition:
+                newData[variable] = li = []
+                for value in definition['values']:
+                    li.append(value)
+            if definition['type'] == 'relative':
+                mapping = {}
+                template = Template(definition['value'])
+                for item in re.finditer(regex, definition['value']):
                     mapping[item.group(1)] = newData[item.group(1)]
-            newData[variable] = template.substitute(**mapping)
+                newData[variable] = template.substitute(**mapping)
+            if definition['type'] == 'source':
+                template = Template(definition['value'])
+                mapping = {}
+                for item in re.finditer(regex, definition['value']):
+                    if item.group(1) == 'var':
+                        mapping[item.group(1)] = getDictValueByPath(originalData, pathTransform(definition['path']))
+                    else: 
+                        mapping[item.group(1)] = newData[item.group(1)]
+                newData[variable] = template.substitute(**mapping)
+        except TypeError as e:
+            print(f"may be ttpLib parsing error with {variable} {definition}")
 
     return newData
 
@@ -188,15 +191,41 @@ vrf context {{ vars['id'] }}
   vni {{ vars['vni'] }}
   rd auto
   address-family ipv4 unicast
-    route-target import {{ vars['asNum'] }}:{{ vars['vni'] }}
-    route-target import {{ vars['asNum'] }}:{{ vars['vni'] }} evpn
-    route-target export {{ vars['asNum'] }}:{{ vars['vni'] }}
-    route-target export {{ vars['asNum'] }}:{{ vars['vni'] }} evpn
+    route-target import 62000:{{ vars['vni'] }}
+    route-target import 62000:{{ vars['vni'] }} evpn
+    route-target export 62000:{{ vars['vni'] }}
+    route-target export 62000:{{ vars['vni'] }} evpn
 router bgp {{ vars['asNum'] }}
   vrf {{ vars['id'] }}
+    {% if vars['routerId'] != "none" -%}
+    router-id {{ vars['routerId'] }}
+    {% endif -%}
+    graceful-restart stalepath-time {{ vars['stalePathTime'] }}
+    {% if vars['multipathRelax'] -%}
+    bestpath as-path multipath-relax
+    {% endif -%}
     address-family ipv4 unicast
       redistribute direct route-map {{ vars['redistributeDirectRMap'] }}
       maximum-paths ibgp 4
+"""))
+
+    serviceTemplatesPerType.append(
+                ServiceTemplatePerType(serviceName='L2VNI',
+                    serviceType='type-1', 
+                    serviceTemplate="""
+vlan 1202
+  name NTNX-MGMT
+  vn-segment 2751202
+interface nve1
+  no shutdown
+  description VTEP [1][NVE]
+  host-reachability protocol bgp
+  source-interface loopback1
+  member vni 227952
+    suppress-arp
+    mcast-group 239.255.0.20
+
+
 """))
 
 

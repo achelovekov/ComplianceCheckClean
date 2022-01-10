@@ -72,6 +72,7 @@ def processRawCollection(service: Service, rawInventoryFolder: str, referenceVal
     rawCollectionFootprints = {}
 
     for device, rawConfig in rawCollectionConfigs.items():
+        print(f"go for device: {device}")
         footprint = {}
         generateFootprint(service, footprint, rawConfig, referenceValues)
         #print(json.dumps(footprint, sort_keys=True, indent=4))
