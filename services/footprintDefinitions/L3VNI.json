@@ -148,7 +148,12 @@
                 "referenceAliasToRead": "vrf"
               }
             ],
-            "setReference": []
+            "setReference": [
+              {
+                "fieldNameToSet": "vrfIpv4Unicast/redistributeDirectRMap",
+                "referenceAliasToWrite": "redistributeDirectRMap"
+              }
+            ]
           }
         ],
         "nodesReference": [
@@ -172,6 +177,38 @@
                 ]
               }
             ]
+          }
+        ]
+      },
+      {
+        "path": [
+          "routeMap"
+        ],
+        "rootKeys": [
+          {
+            "parent": "routeMap",
+            "checkReference": [
+              {
+                "fieldNameToCheck": "id",
+                "referenceAliasToRead": "redistributeDirectRMap"
+              },
+              {
+                "fieldNameToCheck": "matchTag",
+                "referenceAliasToRead": "idNum"
+              }
+            ],
+            "setReference": []
+          }
+        ],
+        "nodesReference": [
+          {
+            "nodeName": "routeMap",
+            "rootKeys": [
+              "id",
+              "matchTag",
+              "seq"
+            ],
+            "nonRootKeys": []
           }
         ]
       }

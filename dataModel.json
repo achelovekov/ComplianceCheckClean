@@ -1,6 +1,76 @@
-[{
+[
+  {
     "serviceName": "L3VNI",
     "serviceVars": [
+      {
+        "siteID": "VTB",
+        "siteVars": [
+          {
+            "serviceType": {
+              "type": "direct",
+              "value": "type-1"
+            },
+            "id": {
+              "type": "direct",
+              "value": "PROD-SRV-APP"
+            },
+            "idNum": {
+              "type": "direct",
+              "value": "173"
+            },
+            "vni": {
+              "type": "direct",
+              "value": "1733601"
+            },
+            "sviId": {
+              "type": "direct",
+              "value": "3601"
+            },
+            "asNum": {
+              "type": "direct",
+              "value": "64517"
+            },
+            "description": {
+              "type": "relative",
+              "value": "L3_VNI_FOR_${id}_${vni}"
+            },
+            "vrfName": {
+              "type": "relative",
+              "value": "VRF_${id}"
+            },
+            "sourceVar": {
+              "type": "source",
+              "path": "l3Inst/vnid",
+              "value": "${var}_[blabla]_${vrfName}"
+            },
+            "redistributeDirectRMap": {
+              "type": "source",
+              "path": "bgp/vrfLite/vrfIpv4Unicast/redistributeDirectRMap",
+              "value": "${var}"
+            },            
+            "redistributeDirectRMapSeq": {
+              "type": "source",
+              "path": "routeMap/seq",
+              "value": "${var}"
+            },
+            "stalePathTime": {
+              "type": "source",
+              "path": "bgp/vrfLite/stalePathTime",
+              "value": "${var}"
+            },
+            "multipathRelax": {
+              "type": "source",
+              "path": "bgp/vrfLite/multipathRelax",
+              "value": "${var}"
+            },
+            "routerId": {
+              "type": "source",
+              "path": "bgp/vrfLite/routerId",
+              "value": "${var}"
+            }
+          }
+        ]
+      },
       {
         "siteID": "014",
         "siteVars": [
@@ -37,6 +107,11 @@
               "type": "source",
               "path": "l3Inst/vnid",
               "value": "${var}_[blabla]_${vrfName}"
+            },
+            "redistributeDirectRMap": {
+              "type": "source",
+              "path": "bgp/vrfLite/vrfIpv4Unicast/redistributeDirectRMap",
+              "value": "${var}"
             }
           },
           {
@@ -72,9 +147,125 @@
               "type": "source",
               "path": "l3Inst/vnid",
               "value": "${var}_[blabla]_${vrfName}"
+            },
+            "redistributeDirectRMap": {
+              "type": "source",
+              "path": "bgp/vrfLite/vrfIpv4Unicast/redistributeDirectRMap",
+              "value": "${var}"
+            },
+            "stalePathTime": {
+              "type": "source",
+              "path": "bgp/vrfLite/stalePathTime",
+              "value": "${var}"
+            },
+            "multipathRelax": {
+              "type": "source",
+              "path": "bgp/vrfLite/multipathRelax",
+              "value": "${var}"
+            },
+            "routerId": {
+              "type": "source",
+              "path": "bgp/vrfLite/routerId",
+              "value": "${var}"
+            }
+          },
+          {
+            "serviceType": {
+              "type": "direct",
+              "value": "type-1"
+            },
+            "id": {
+              "type": "direct",
+              "value": "PROD-SRV-APP"
+            },
+            "vni": {
+              "type": "direct",
+              "value": "1733601"
+            },
+            "sviId": {
+              "type": "direct",
+              "value": "3601"
+            },
+            "asNum": {
+              "type": "direct",
+              "value": "64517"
+            },
+            "description": {
+              "type": "relative",
+              "value": "L3_VNI_FOR_${id}_${vni}"
+            },
+            "vrfName": {
+              "type": "relative",
+              "value": "VRF_${id}"
+            },
+            "sourceVar": {
+              "type": "source",
+              "path": "l3Inst/vnid",
+              "value": "${var}_[blabla]_${vrfName}"
+            },
+            "redistributeDirectRMap": {
+              "type": "source",
+              "path": "bgp/vrfLite/vrfIpv4Unicast/redistributeDirectRMap",
+              "value": "${var}"
+            }
+          },
+          {
+            "serviceType": {
+              "type": "direct",
+              "value": "type-1"
+            },
+            "id": {
+              "type": "direct",
+              "value": "e57Z"
+            },
+            "vni": {
+              "type": "direct",
+              "value": "2570000"
+            },
+            "sviId": {
+              "type": "direct",
+              "value": "3957"
+            },
+            "asNum": {
+              "type": "direct",
+              "value": "65514"
+            },
+            "description": {
+              "type": "relative",
+              "value": "L3_VNI_FOR_${id}_${vni}"
+            },
+            "vrfName": {
+              "type": "relative",
+              "value": "VRF_${id}"
+            },
+            "sourceVar": {
+              "type": "source",
+              "path": "l3Inst/vnid",
+              "value": "${var}_[blabla]_${vrfName}"
+            },
+            "redistributeDirectRMap": {
+              "type": "source",
+              "path": "bgp/vrfLite/vrfIpv4Unicast/redistributeDirectRMap",
+              "value": "${var}"
+            },
+            "stalePathTime": {
+              "type": "source",
+              "path": "bgp/vrfLite/stalePathTime",
+              "value": "${var}"
+            },
+            "multipathRelax": {
+              "type": "source",
+              "path": "bgp/vrfLite/multipathRelax",
+              "value": "${var}"
+            },
+            "routerId": {
+              "type": "source",
+              "path": "bgp/vrfLite/routerId",
+              "value": "${var}"
             }
           }
         ]
       }
     ]
-  }]
+  }
+]

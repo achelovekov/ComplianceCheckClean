@@ -135,7 +135,7 @@ router bgp {{ asn | DIGIT }}
 """
 
     templates['routeMap'] = """
-<group name="routeMap">
+<group name="routeMap*">
 route-map {{ id }} permit {{ seq }} 
   {{ deny | set("False") }}
   {{ permit | set("True") }}
@@ -143,7 +143,7 @@ route-map {{ id }} permit {{ seq }}
   match tag {{ matchTag }}
 </group>
 
-<group name="routeMap">
+<group name="routeMap*">
 route-map {{ id }} deny {{ seq }}
   {{ deny | set("True") }}
   {{ permit | set("False") }}

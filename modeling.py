@@ -2,6 +2,7 @@
 from typing import Any, Tuple, List, Dict, Union
 from pydantic import BaseModel
 import json
+import templating 
 
 class NonRootKey(BaseModel):
   path: Tuple
@@ -77,19 +78,26 @@ class ReferenceValues(BaseModel):
   
   def setReferenceValue(self, object, setReference: SetReference):
     for setItem in setReference:
-      self.append(ReferenceValue(id=setItem.referenceAliasToWrite, value=object[setItem.fieldNameToSet]))
+      value = templating.getDictValueByPath(object, templating.pathTransform(setItem.fieldNameToSet))
+      self.append(ReferenceValue(id=setItem.referenceAliasToWrite, value=value))
+      print(self.__root__)
     
   def checkObjectByCheckReference(self, object: List, checkReference: CheckReference):
     for item in object:
       ind = True
       for checkItem in checkReference:
-        if item[checkItem.fieldNameToCheck] == self.getReferenceValue(checkItem.referenceAliasToRead):
-          ind = ind and True
-        else:
-          ind = ind and False
+        if checkItem.fieldNameToCheck in item:
+          if item[checkItem.fieldNameToCheck] == self.getReferenceValue(checkItem.referenceAliasToRead):
+            ind = ind and True
+          else:
+            ind = ind and False
       if ind:
         return item
     return None
+
+  def updateReferenceValues(self, data: Dict):
+    for key, value in data.items():
+      self.append(ReferenceValue(id=key, value=value))
 
 class RootElement(BaseModel):
   path: List = []

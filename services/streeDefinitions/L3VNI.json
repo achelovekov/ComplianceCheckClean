@@ -1,43 +1,48 @@
 [
   {
     "path": "vlan ${sviId}",
-    "filter": []
+    "filter": [],
+    "let": "all"
   },
   {
     "path": "vrf context ${id}",
     "filter": [
       "address-family"
     ],
+    "let": "all",
     "children": [
       {
         "path": "address-family ipv4 unicast",
-        "filter": []
+        "filter": [],
+        "let": "all"
       }
     ]
   },
   {
     "path": "router bgp ${asNum}",
-    "filter": [
-      "all"
-    ],
+    "filter": "all",
+    "let": "all",
     "children": [
       {
         "path": "vrf ${id}",
         "filter": [
-          "address-family",
-          "neighbor"
+          "neighbor",
+          "address-family"
         ],
+        "let": "all",
         "children": [
           {
             "path": "address-family ipv4 unicast",
-            "filter": []
-          },
-          {
-            "path": "address-family ipv6 unicast",
-            "filter": []
+            "filter": [],
+            "let": "all"
           }
         ]
       }
     ]
+  },
+  {
+    "path": "route-map ${redistributeDirectRMap} permit ${redistributeDirectRMapSeq}",
+    "filter": [],
+    "let": "all"
   }
 ]

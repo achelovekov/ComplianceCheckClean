@@ -9,21 +9,28 @@ from pydantic import BaseModel
 import sot
 
 
+def getDirectVarsValues(varsFromSot: Dict):
+    processedData = {}
+    for variable, definition in varsFromSot.items():
+        if definition['type'] == 'direct' and 'value' in definition:
+            processedData[variable] = definition['value'] 
+    return processedData
+
 def getVarsFromSoT(filename, siteID, serviceName, key) -> Dict:
 
     serviceSoT = sot.ServiceSoT.parse_file(filename)
     return serviceSoT.getVarsByKey(serviceName, siteID, key)
 
+def getDictValueByPath(data:Dict, path:List) -> Any:
+    try:
+        return getDictValueByPath(data[path[0]], path[1:]) if path else data
+    except KeyError as e:
+        return "$MUSTEXISTINSOURCEVAR"
+
+def pathTransform(data:str):
+    return data.split('/')
+
 def processVariables(data:Dict, originalData:Dict):
-
-    def getDictValueByPath(data:Dict, path:List) -> Any:
-        try:
-            return getDictValueByPath(data[path[0]], path[1:]) if path else data
-        except KeyError as e:
-            return "$MUSTEXISTINSOURCEVAR"
-
-    def pathTransform(data:str):
-        return data.split('/')
 
     newData = {}
     regex = '\${([a-zA-Z]+)}'
@@ -57,7 +64,8 @@ def processVariables(data:Dict, originalData:Dict):
 
 class STreeServiceProcessedItem(BaseModel):
     path: List[str] = []
-    filter: List[str] = []
+    filter: Union[List[str], str] = []
+    let:  Union[List[str], str] = []
     children: Optional[List['STreeServiceProcessedItem']] = []
 
 STreeServiceProcessedItem.update_forward_refs()
@@ -76,7 +84,8 @@ class STreeServiceProcessed(BaseModel):
 
 class STreeServiceItem(BaseModel):
     path: str
-    filter: List[str]
+    filter: Union[List[str], str]
+    let:  Union[List[str], str]
     children: Optional[List['STreeServiceItem']]
 
 STreeServiceItem.update_forward_refs()
@@ -106,6 +115,7 @@ class STreeService(BaseModel):
         sTreeServiceProcessedItem.path = self.processString(sTreeServiceItem.path, regex, vars).split()
 
         sTreeServiceProcessedItem.filter = sTreeServiceItem.filter
+        sTreeServiceProcessedItem.let = sTreeServiceItem.let
 
         if sTreeServiceItem.children:
             for child in sTreeServiceItem.children:
@@ -134,10 +144,10 @@ def printItem(prefix: str, content: List, bias: int):
 
 def processItem(rootNode: Node, sTreeServiceProcessedItem: STreeServiceProcessedItem, bias: int, path: List, buf: List[str], indicator: Dict):
     path = path + sTreeServiceProcessedItem.path
-    if sTreeServiceProcessedItem.filter == ["all"]:
+    if "all" in sTreeServiceProcessedItem.filter:
         printBuf = []
     else:
-        printBuf = printPath(rootNode, path, sTreeServiceProcessedItem.filter)
+        printBuf = printPath(rootNode, path, sTreeServiceProcessedItem.filter, sTreeServiceProcessedItem.let)
     
     if sTreeServiceProcessedItem.children or printBuf:
         buf.append(printItem(sTreeServiceProcessedItem.path, printBuf, bias))
@@ -191,22 +201,15 @@ vrf context {{ vars['id'] }}
   vni {{ vars['vni'] }}
   rd auto
   address-family ipv4 unicast
-    route-target import 62000:{{ vars['vni'] }}
-    route-target import 62000:{{ vars['vni'] }} evpn
-    route-target export 62000:{{ vars['vni'] }}
-    route-target export 62000:{{ vars['vni'] }} evpn
+    route-target both auto
+    route-target both auto evpn
 router bgp {{ vars['asNum'] }}
   vrf {{ vars['id'] }}
-    {% if vars['routerId'] != "none" -%}
-    router-id {{ vars['routerId'] }}
-    {% endif -%}
-    graceful-restart stalepath-time {{ vars['stalePathTime'] }}
-    {% if vars['multipathRelax'] -%}
-    bestpath as-path multipath-relax
-    {% endif -%}
     address-family ipv4 unicast
       redistribute direct route-map {{ vars['redistributeDirectRMap'] }}
       maximum-paths ibgp 4
+route-map {{ vars['redistributeDirectRMap'] }} permit {{ vars['redistributeDirectRMapSeq']}}
+  match tag {{ vars['idNum']}}
 """))
 
     serviceTemplatesPerType.append(
@@ -226,6 +229,35 @@ interface nve1
     mcast-group 239.255.0.20
 
 
+"""))
+
+    serviceTemplatesPerType.append(
+                ServiceTemplatePerType(serviceName='L3VNSBER',
+                    serviceType='type-1', 
+                    serviceTemplate="""
+vlan {{ vars['sviId'] }}
+  name VRF_{{ vars['id'] }}
+  vn-segment {{ vars['vni'] }}
+vrf context {{ vars['id'] }}
+  vni {{ vars['vni'] }}
+  rd auto
+  address-family ipv4 unicast
+    route-target both auto
+    route-target both auto evpn
+router bgp {{ vars['asNum'] }}
+  vrf {{ vars['id'] }}
+    {% if vars['routerId'] != "none" -%}
+    router-id {{ vars['routerId'] }}
+    {% endif -%}
+    graceful-restart stalepath-time {{ vars['stalePathTime'] }}
+    {% if vars['multipathRelax'] -%}
+    bestpath as-path multipath-relax
+    {% endif -%}
+    address-family ipv4 unicast
+      redistribute direct route-map {{ vars['redistributeDirectRMap'] }}
+      maximum-paths ibgp 4
+route-map {{ vars['redistributeDirectRMap'] }} permit {{ vars['redistributeDirectRMapSeq']}}
+  match tag {{ vars['idNum']}}
 """))
 
 

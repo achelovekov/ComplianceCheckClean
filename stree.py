@@ -1,5 +1,5 @@
 
-from typing import Dict, Generator, List
+from typing import Dict, Generator, List, Union
 from pydantic import BaseModel
 
 class Node(BaseModel):
@@ -131,36 +131,45 @@ def streeFromConfig(config) -> Node:
 
     return rootNode
 
+def cleanSubTreeWithLet(nodeBuf: List[Node], let: Union[str, List[str]]):
+    if let and "all" not in let:
+        for node in nodeBuf:
+            node.children[:] = [child for child in node.children if child.name in let]
+
 def printPath(
         rootNode: Node, 
         path: List, 
-        filter: List):
+        filter: Union[List, str],
+        let: Union[List, str]
+        ):
 
     nodeBuf = []
     printBuf = []
-    
+
     subTree(rootNode, path, nodeBuf) 
+
+    cleanSubTreeWithLet(nodeBuf, let)
 
     for node in nodeBuf:
         printNode(node, 0, 2, '', printBuf, filter)
-    
+
     return printBuf
 
 if __name__ == "__main__":
 
-    device = 'ACOD-PROD-LF10-1'
+    device = '10.5.2.69'
 
-    rootNode = streeFromFile(f"RawConfigs/tmpTest/{device}/{device}-running.txt")
+    rootNode = streeFromFile(f"RawConfigs/configTest/{device}/{device}-running.txt")
 
-    #print(rootNode.json())
+    print(rootNode.json())
 
     path = [
-        "vrf",
-        "context",
-        "PROD-SRV-APP"
+        "vlan",
+        "3601"
       ]
     filter = []
+    let = "any"
 
-    printBuf = printPath(rootNode, path, filter)
-    print('\n'.join(printBuf))  
+    printBuf = printPath(rootNode, path, filter, let)
+    #print('\n'.join(printBuf))  
     

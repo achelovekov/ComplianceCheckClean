@@ -79,11 +79,7 @@ def processRawCollection(service: Service, rawInventoryFolder: str, referenceVal
         rawCollectionFootprints[device] = footprint
     return (rawCollectionConfigs, rawCollectionFootprints)
 
-def consistency(service: Service, rawInventoryFolder: str, referenceValuesFilename: str) -> Tuple[Dict, Dict, Dict]:
-
-    with open(referenceValuesFilename, encoding = 'utf-8') as f:
-        data = f.read()
-        referenceValues = ReferenceValues.parse_raw(data) 
+def consistency(service: Service, rawInventoryFolder: str, referenceValues: ReferenceValues) -> Tuple[Dict, Dict, Dict]:
 
     rawCollectionConfigs, rawCollectionFootprints = processRawCollection(service, rawInventoryFolder, referenceValues)
 

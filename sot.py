@@ -13,6 +13,7 @@ class Var(BaseModel):
 class SiteVar(BaseModel):
     serviceType: Optional[Var]
     id: Optional[Var]
+    idNum: Optional[Var]
     vni: Optional[Var]
     sviId: Optional[Var]
     asNum: Optional[Var]
@@ -23,6 +24,7 @@ class SiteVar(BaseModel):
     stalePathTime: Optional[Var]
     multipathRelax: Optional[Var]
     routerId: Optional[Var]
+    redistributeDirectRMapSeq: Optional[Var]
 
 class ServiceVar(BaseModel):
     siteID: str
