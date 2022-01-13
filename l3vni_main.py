@@ -9,7 +9,7 @@ from templating import *
 serviceName = 'L3VNI'
 serviceKey = 'PROD-SRV-APP'
 siteID = 'VTB'
-configsFolder = 'RawConfigs/configTest'
+configsFolder = 'RawConfigs/config'
 service = Service.parse_file(f"services/serviceDefinitions/{serviceName}.json")
 sTreeService = STreeService.parse_file(service.streeDefinition)
 referenceValuesFilename = 'referenceValues.json'
@@ -23,6 +23,7 @@ if not varsFromSot:
     exit()
 
 print(json.dumps(varsFromSot, sort_keys=True, indent=4))
+
 referenceValues.updateReferenceValues(getDirectVarsValues(varsFromSot))
 print(referenceValues.json())
 
@@ -31,10 +32,10 @@ rawCollectionConfigs, rawCollectionFootprints, footprintHashSet = consistency(se
 """ for k, v in footprintHashSet.items():
     print(k)
     print(v.devices)
-    print(json.dumps(v.config, sort_keys=True, indent=4)) """
+    print(json.dumps(v.config, sort_keys=True, indent=4))  """
 
 for device, footprint in rawCollectionFootprints.items():
-    print(device)
+    print(f"footprint for: {device}")
     print(json.dumps(footprint[serviceName], sort_keys=True, indent=4))
 
 
@@ -49,11 +50,11 @@ for device, footprint in rawCollectionFootprints.items():
         sTreeServiceProcessed = sTreeService.process(vars)
         rootNode = streeFromConfig(rawCollectionConfigs[device])
         templated = TemplatedAuxilary.generateTemplated(vars, serviceName, serviceType)
-        print(f"templated: {templated}")
+        #print(f"templated: {templated}")
         result = []
         genereteStreeOriginal(sTreeServiceProcessed, rootNode, result)
         original = '\n'.join(result)
-        print(f"original: {original}")
+        #print(f"original: {original}")
         complianceReportItem = ComplianceReportItem(key=serviceKey, original=original, templated=templated, deviceName=device, footprint=json.dumps(rawCollectionFootprints[device][serviceName]))
         complianceReport.append(complianceReportItem)
 

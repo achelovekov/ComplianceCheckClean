@@ -7,6 +7,7 @@ from definition import Service
 from ttpLib import TTPLib
 import os
 import json
+from copy import deepcopy
 
 class Item(BaseModel):
     configHash: str
@@ -74,7 +75,8 @@ def processRawCollection(service: Service, rawInventoryFolder: str, referenceVal
     for device, rawConfig in rawCollectionConfigs.items():
         print(f"go for device: {device}")
         footprint = {}
-        generateFootprint(service, footprint, rawConfig, referenceValues)
+        referenceValuesOriginal = deepcopy(referenceValues)
+        generateFootprint(service, footprint, rawConfig, referenceValuesOriginal)
         #print(json.dumps(footprint, sort_keys=True, indent=4))
         rawCollectionFootprints[device] = footprint
     return (rawCollectionConfigs, rawCollectionFootprints)

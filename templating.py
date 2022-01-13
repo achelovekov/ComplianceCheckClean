@@ -207,7 +207,6 @@ router bgp {{ vars['asNum'] }}
   vrf {{ vars['id'] }}
     address-family ipv4 unicast
       redistribute direct route-map {{ vars['redistributeDirectRMap'] }}
-      maximum-paths ibgp 4
 route-map {{ vars['redistributeDirectRMap'] }} permit {{ vars['redistributeDirectRMapSeq']}}
   match tag {{ vars['idNum']}}
 """))
