@@ -3,6 +3,11 @@ from typing import Any, Tuple, List, Dict, Union
 from pydantic import BaseModel
 import json
 import templating 
+from dict_hash import dict_hash, hashable, sha256
+import definition
+from ttpLib import TTPLib
+import os
+from copy import deepcopy
 
 class NonRootKey(BaseModel):
   path: Tuple
@@ -213,19 +218,112 @@ def goRef(object: Dict, rootElement: RootElement, candidate: Dict, referenceValu
   else:
     pass
 
+def getDirectVarsValues(varsFromSot: Dict) -> ReferenceValues:
 
-class ComplianceReportItem(BaseModel):
-    key: str
-    footprint: str
-    original: str
-    templated: str
-    deviceName: str
+    referenceValues = ReferenceValues()
 
-class ComplianceReport(BaseModel):
-  __root__: List[ComplianceReportItem] = []
-
-  def append(self, complianceReportItem:ComplianceReportItem):
-    self.__root__.append(complianceReportItem)
+    processedData = {}
+    for variable, definition in varsFromSot.items():
+        if definition['type'] == 'direct' and 'value' in definition:
+            processedData[variable] = definition['value'] 
+    
+    referenceValues.updateReferenceValues(processedData)
   
-  def __iter__(self):
-    return iter(self.__root__)
+    return referenceValues
+
+class Item(BaseModel):
+    configHash: str
+    config: Dict
+    devices: List[str]
+
+def checkEmptyFootprint(di):
+    for k in list(di):
+        if not di[k]:
+            del di[k]
+        else:
+            if isinstance(di[k], Dict):
+                checkEmptyFootprint(di[k])
+                if not di[k]:
+                    del di[k]
+
+def candidateGenerate(referenceValues: ReferenceValues, parsedData: Dict, serviceDefinition: definition.ServiceDefinition):
+    with open(serviceDefinition.footprintDefinition, encoding = 'utf-8') as fi:
+        data = fi.read()
+        rootElements = RootElements.parse_raw(data) 
+    
+    candidate = {}
+
+    for rootElement in rootElements:
+        #go(parsedData, rootElement, 0, candidate, referenceValues)
+        goRef(parsedData, rootElement, candidate, referenceValues)
+    
+    checkEmptyFootprint(candidate)
+    #print(json.dumps(candidate, sort_keys=True, indent=4))
+    return candidate
+
+def generateFootprint(serviceDefinition: definition.ServiceDefinition, footprint: Dict, rawConfig, referenceValues):
+    if serviceDefinition.subServices:
+        for subService in serviceDefinition.subServices:
+            generateFootprint(subService, footprint, rawConfig, referenceValues)
+    else:
+        parsedData = TTPLib.parser(rawConfig, serviceDefinition.ttpTemplates)
+        #print(json.dumps(parsedData, sort_keys=True, indent=4))
+
+    if serviceDefinition.footprintDefinition:
+        footprint[serviceDefinition.serviceName] = candidateGenerate(referenceValues, parsedData, serviceDefinition)
+
+def generateRawCollection(rawInventoryFolder: str) -> Dict:
+    devices = [f.name for f in os.scandir(rawInventoryFolder) if f.is_dir()]
+
+    rawCollection = {}
+
+    for device in devices:
+        try:
+            with open(f"{rawInventoryFolder}/{device}/{device}-running.txt", encoding = 'utf-8') as f:
+                rawConfig = f.read()
+                rawCollection[device] = rawConfig
+
+        except Exception as e:
+            print(f"{e}")
+            exit()
+    
+    return rawCollection
+        
+def processRawCollection(serviceDefinition: definition.ServiceDefinition, rawInventoryFolder: str, referenceValues: ReferenceValues) -> Tuple[Dict, Dict]:
+    
+    rawCollection = generateRawCollection(rawInventoryFolder)
+    rawCollectionFootprints = {}
+
+    for device, rawConfig in rawCollection.items():
+        #print(f"go for device: {device}")
+        footprint = {}
+        referenceValuesOriginal = deepcopy(referenceValues)
+        generateFootprint(serviceDefinition, footprint, rawConfig, referenceValuesOriginal)
+        #print(json.dumps(footprint, sort_keys=True, indent=4))
+        rawCollectionFootprints[device] = footprint
+    return (rawCollection, rawCollectionFootprints)
+
+def generateFootprintDB(serviceDefinition: definition.ServiceDefinition, rawInventoryFolder: str, referenceValues: ReferenceValues) -> Tuple[Dict, Dict]:
+
+    rawCollectionConfigs, rawCollectionFootprints = processRawCollection(serviceDefinition, rawInventoryFolder, referenceValues)
+    
+    return (rawCollectionConfigs, rawCollectionFootprints)
+
+def generateConsistencyDB(rawCollectionFootprints: Dict) -> Dict:
+    consistencyHashSet = {}
+    for device, config in rawCollectionFootprints.items():
+        configHash = sha256(config)
+        if configHash not in consistencyHashSet:
+            consistencyHashSet[configHash] = Item(configHash=configHash, config=config, devices = [device])
+        else:
+            item = consistencyHashSet[configHash]
+            item.devices.append(device)
+    return consistencyHashSet
+
+def generateTTPDB(serviceName: str, rawInventoryFolder: str):
+  serviceDefinition = definition.ServiceDefinition.parse_file(f"services/serviceDefinitions/{serviceName}.json")
+  rawCollection = generateRawCollection(rawInventoryFolder)
+  for device, rawConfig in rawCollection.items():
+    parsedData = TTPLib.parser(rawConfig, serviceDefinition.ttpTemplates)
+    print(f"Parsed data for device: {device}")
+    print(json.dumps(parsedData, sort_keys=True, indent=4))

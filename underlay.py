@@ -1,8 +1,8 @@
 import json
 import compliance
 
-serviceName = 'L3VNI'
-serviceKey = 'PROD-SRV-APP'
+serviceName = 'underlay'
+serviceKey = 'Ethernet1/51'
 siteID = 'VTB'
 configsFolder = 'RawConfigs/configTestNew'
 SOTDB = 'dataModel.json' 
@@ -17,5 +17,5 @@ for k, v in consistencyReport.items():
   print(json.dumps(v.config, sort_keys=True, indent=4))   
 
 
-complianceReport = compliance.ComplianceReport.generate(serviceName, serviceKey, siteID, configsFolder, SOTDB)
-print(complianceReport.json())  
+""" complianceReport = compliance.ComplianceReport.generate(serviceName, serviceKey, siteID, configsFolder, SOTDB)
+print(complianceReport.json())   """

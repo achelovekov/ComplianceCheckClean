@@ -152,6 +152,25 @@ route-map {{ id }} deny {{ seq }}
 </group>
 """
 
+    templates['interfaces'] = """
+<vars>
+# template variable with custom regular expression:
+physIf = "Ethernet\d+\/\d+|mgmt0|port-channel\d+"
+</vars>
+
+<group name="interfaces">
+<group name="l3PhysIf*" containsall="ipAddress">
+interface {{ id | re("physIf") }} 
+  ip address {{ ipAddress }}
+  mtu {{ mtu | default("default") }}
+  no ip redirects {{ ipv4Redirects | set("False") }}
+  ip redirects {{ ipv4Redirects | set("True") }}
+  no ipv6 redirects {{ ipv6Redirects | set("False") }}
+  ipv6 redirects {{ ipv6Redirects | set("True") }}
+</group>
+</group>
+"""
+
 
     @classmethod
     def getCombinedTemplate(cls, chunkNames):

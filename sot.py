@@ -1,7 +1,6 @@
 from __future__ import annotations
 
 from typing import Dict, List, Optional
-
 from pydantic import BaseModel
 
 
@@ -74,3 +73,8 @@ class ServiceSoT(BaseModel):
                 return None
         else:
             return None
+
+def getVarsFromSoT(filename, siteID, serviceName, key) -> Dict:
+    serviceSoT = ServiceSoT.parse_file(filename)
+    return serviceSoT.getVarsByKey(serviceName, siteID, key)
+

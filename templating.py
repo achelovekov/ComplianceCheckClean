@@ -8,19 +8,6 @@ from stree import *
 from pydantic import BaseModel
 import sot
 
-
-def getDirectVarsValues(varsFromSot: Dict):
-    processedData = {}
-    for variable, definition in varsFromSot.items():
-        if definition['type'] == 'direct' and 'value' in definition:
-            processedData[variable] = definition['value'] 
-    return processedData
-
-def getVarsFromSoT(filename, siteID, serviceName, key) -> Dict:
-
-    serviceSoT = sot.ServiceSoT.parse_file(filename)
-    return serviceSoT.getVarsByKey(serviceName, siteID, key)
-
 def getDictValueByPath(data:Dict, path:List) -> Any:
     try:
         return getDictValueByPath(data[path[0]], path[1:]) if path else data
@@ -195,7 +182,7 @@ class TemplatedAuxilary():
                     serviceType='type-1', 
                     serviceTemplate="""
 vlan {{ vars['sviId'] }}
-  name VRF_{{ vars['id'] }}
+  name L3_{{ vars['idNum'] }}
   vn-segment {{ vars['vni'] }}
 vrf context {{ vars['id'] }}
   vni {{ vars['vni'] }}
@@ -207,6 +194,7 @@ router bgp {{ vars['asNum'] }}
   vrf {{ vars['id'] }}
     address-family ipv4 unicast
       redistribute direct route-map {{ vars['redistributeDirectRMap'] }}
+      maximum-paths 2
 route-map {{ vars['redistributeDirectRMap'] }} permit {{ vars['redistributeDirectRMapSeq']}}
   match tag {{ vars['idNum']}}
 """))
