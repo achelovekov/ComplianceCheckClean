@@ -9,7 +9,7 @@
             "checkReference": [
               {
                 "fieldNameToCheck": "id",
-                "referenceAliasToRead": "vrf"
+                "referenceAliasToRead": "id"
               }
             ],
             "setReference": [
@@ -145,7 +145,7 @@
             "checkReference": [
               {
                 "fieldNameToCheck": "id",
-                "referenceAliasToRead": "vrf"
+                "referenceAliasToRead": "id"
               }
             ],
             "setReference": [

@@ -218,13 +218,12 @@ def goRef(object: Dict, rootElement: RootElement, candidate: Dict, referenceValu
   else:
     pass
 
-def getDirectVarsValues(varsFromSot: Dict) -> ReferenceValues:
-
-    referenceValues = ReferenceValues()
+def getDirectVarsValues(referenceValues: ReferenceValues, varsFromSot: Dict) -> ReferenceValues:
 
     processedData = {}
     for variable, definition in varsFromSot.items():
-        if definition['type'] == 'direct' and 'value' in definition:
+      if definition:
+        if definition['type'] == 'direct' and 'value' in definition and variable != "id":
             processedData[variable] = definition['value'] 
     
     referenceValues.updateReferenceValues(processedData)
@@ -258,19 +257,19 @@ def candidateGenerate(referenceValues: ReferenceValues, parsedData: Dict, servic
         goRef(parsedData, rootElement, candidate, referenceValues)
     
     checkEmptyFootprint(candidate)
-    #print(json.dumps(candidate, sort_keys=True, indent=4))
     return candidate
 
-def generateFootprint(serviceDefinition: definition.ServiceDefinition, footprint: Dict, rawConfig, referenceValues):
+def generateFootprint(serviceDefinition: definition.ServiceDefinition, rawConfig, referenceValues):
     if serviceDefinition.subServices:
         for subService in serviceDefinition.subServices:
-            generateFootprint(subService, footprint, rawConfig, referenceValues)
+            generateFootprint(subService, rawConfig, referenceValues)
     else:
         parsedData = TTPLib.parser(rawConfig, serviceDefinition.ttpTemplates)
         #print(json.dumps(parsedData, sort_keys=True, indent=4))
 
     if serviceDefinition.footprintDefinition:
-        footprint[serviceDefinition.serviceName] = candidateGenerate(referenceValues, parsedData, serviceDefinition)
+        footprint = candidateGenerate(referenceValues, parsedData, serviceDefinition)
+        return footprint
 
 def generateRawCollection(rawInventoryFolder: str) -> Dict:
     devices = [f.name for f in os.scandir(rawInventoryFolder) if f.is_dir()]
@@ -296,10 +295,9 @@ def processRawCollection(serviceDefinition: definition.ServiceDefinition, rawInv
 
     for device, rawConfig in rawCollection.items():
         #print(f"go for device: {device}")
-        footprint = {}
         referenceValuesOriginal = deepcopy(referenceValues)
-        generateFootprint(serviceDefinition, footprint, rawConfig, referenceValuesOriginal)
-        #print(json.dumps(footprint, sort_keys=True, indent=4))
+        footprint = generateFootprint(serviceDefinition, rawConfig, referenceValuesOriginal)
+        print(json.dumps(footprint, sort_keys=True, indent=4))
         rawCollectionFootprints[device] = footprint
     return (rawCollection, rawCollectionFootprints)
 

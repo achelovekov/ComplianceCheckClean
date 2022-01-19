@@ -1,0 +1,9 @@
+{
+    "serviceName": "UnderlayInterface",
+    "footprintDefinition": "services/footprintDefinitions/UnderlayInterface.json",
+    "streeDefinition": "services/streeDefinitions/UnderlayInterface.json",
+    "ttpTemplates": [
+        "interfaces"
+    ],
+    "subServices": []
+}

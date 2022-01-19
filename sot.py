@@ -24,6 +24,7 @@ class SiteVar(BaseModel):
     multipathRelax: Optional[Var]
     routerId: Optional[Var]
     redistributeDirectRMapSeq: Optional[Var]
+    ipAddress: Optional[Var]
 
 class ServiceVar(BaseModel):
     siteID: str

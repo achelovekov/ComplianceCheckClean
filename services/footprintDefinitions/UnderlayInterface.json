@@ -1,0 +1,32 @@
+[
+    {
+      "path": [
+        "interfaces",
+        "l3PhysIf"
+      ],
+      "rootKeys": [
+        {
+          "parent": "l3PhysIf",
+          "checkReference": [
+            {
+              "fieldNameToCheck": "id",
+              "referenceAliasToRead": "id"
+            }
+          ],
+          "setReference": []
+        }
+      ],
+      "nodesReference": [
+        {
+          "nodeName": "l3PhysIf",
+          "rootKeys": [
+            "id",
+            "ipAddress",
+            "ipv4Redirects",
+            "mtu"
+          ],
+          "nonRootKeys": []
+        }
+      ]
+    }
+]

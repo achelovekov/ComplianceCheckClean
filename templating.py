@@ -23,27 +23,28 @@ def processVariables(data:Dict, originalData:Dict):
     regex = '\${([a-zA-Z]+)}'
     for variable, definition in data.items():
         try:
-            if definition['type'] == 'direct' and 'value' in definition:
-                newData[variable] = definition['value'] 
-            if definition['type'] == 'direct' and 'values' in definition:
-                newData[variable] = li = []
-                for value in definition['values']:
-                    li.append(value)
-            if definition['type'] == 'relative':
-                mapping = {}
-                template = Template(definition['value'])
-                for item in re.finditer(regex, definition['value']):
-                    mapping[item.group(1)] = newData[item.group(1)]
-                newData[variable] = template.substitute(**mapping)
-            if definition['type'] == 'source':
-                template = Template(definition['value'])
-                mapping = {}
-                for item in re.finditer(regex, definition['value']):
-                    if item.group(1) == 'var':
-                        mapping[item.group(1)] = getDictValueByPath(originalData, pathTransform(definition['path']))
-                    else: 
+            if definition and variable != "id":
+                if definition['type'] == 'direct' and 'value' in definition:
+                    newData[variable] = definition['value'] 
+                if definition['type'] == 'direct' and 'values' in definition:
+                    newData[variable] = li = []
+                    for value in definition['values']:
+                        li.append(value)
+                if definition['type'] == 'relative':
+                    mapping = {}
+                    template = Template(definition['value'])
+                    for item in re.finditer(regex, definition['value']):
                         mapping[item.group(1)] = newData[item.group(1)]
-                newData[variable] = template.substitute(**mapping)
+                    newData[variable] = template.substitute(**mapping)
+                if definition['type'] == 'source':
+                    template = Template(definition['value'])
+                    mapping = {}
+                    for item in re.finditer(regex, definition['value']):
+                        if item.group(1) == 'var':
+                            mapping[item.group(1)] = getDictValueByPath(originalData, pathTransform(definition['path']))
+                        else: 
+                            mapping[item.group(1)] = newData[item.group(1)]
+                    newData[variable] = template.substitute(**mapping)
         except TypeError as e:
             print(f"may be ttpLib parsing error with {variable} {definition}")
 
@@ -245,6 +246,14 @@ router bgp {{ vars['asNum'] }}
       maximum-paths ibgp 4
 route-map {{ vars['redistributeDirectRMap'] }} permit {{ vars['redistributeDirectRMapSeq']}}
   match tag {{ vars['idNum']}}
+"""))
+
+    serviceTemplatesPerType.append(
+                ServiceTemplatePerType(serviceName='UnderlayInterface',
+                    serviceType='type-1', 
+                    serviceTemplate="""
+interface {{ vars['id'] }}
+  ip address {{ vars['ipAddress'] }}
 """))
 
 
