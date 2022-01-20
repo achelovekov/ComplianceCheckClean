@@ -170,7 +170,15 @@ interface {{ id | re("physIf") }}
 </group>
 </group>
 """
-
+    templates['ospf'] = """
+<group name='ospf'>
+router ospf {{ id }}
+  bfd {{ bfd | set("True") | default("False")}}
+  router-id {{ routerId | default("none") }}
+  timers lsa-group-pacing {{ lsaGroupPacing | default("none") }}
+  timers lsa-arrival {{ lsaArrival | default("none") }}												  
+</group>
+"""
 
     @classmethod
     def getCombinedTemplate(cls, chunkNames):

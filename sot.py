@@ -25,6 +25,9 @@ class SiteVar(BaseModel):
     routerId: Optional[Var]
     redistributeDirectRMapSeq: Optional[Var]
     ipAddress: Optional[Var]
+    lsaGroupPacing: Optional[Var]
+    lsaArrival: Optional[Var]
+    bfd: Optional[Var]
 
 class ServiceVar(BaseModel):
     siteID: str

@@ -2,10 +2,9 @@ import json
 import compliance
 import definition
 
-serviceName = 'UnderlayInterface'
+serviceName = 'ospf'
 keys = definition.KeysDefinition()
-keys.append(definition.KeyDefinition(footprintKey='Ethernet1/51', SoTKey='general'))
-keys.append(definition.KeyDefinition(footprintKey='Ethernet1/52', SoTKey='general'))
+keys.append(definition.KeyDefinition(footprintKey='UNDERLAY', SoTKey='general'))
 
 siteID = 'VTB'
 configsFolder = 'RawConfigs/configTest'

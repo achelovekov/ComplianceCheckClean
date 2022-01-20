@@ -23,7 +23,7 @@ def processVariables(data:Dict, originalData:Dict):
     regex = '\${([a-zA-Z]+)}'
     for variable, definition in data.items():
         try:
-            if definition and variable != "id":
+            if definition:
                 if definition['type'] == 'direct' and 'value' in definition:
                     newData[variable] = definition['value'] 
                 if definition['type'] == 'direct' and 'values' in definition:
@@ -47,6 +47,9 @@ def processVariables(data:Dict, originalData:Dict):
                     newData[variable] = template.substitute(**mapping)
         except TypeError as e:
             print(f"may be ttpLib parsing error with {variable} {definition}")
+
+    if 'id' in newData:
+        del newData['id']
 
     return newData
 
@@ -183,7 +186,7 @@ class TemplatedAuxilary():
                     serviceType='type-1', 
                     serviceTemplate="""
 vlan {{ vars['sviId'] }}
-  name L3_{{ vars['idNum'] }}
+  name L3_BLABLA{{ vars['idNum'] }}
   vn-segment {{ vars['vni'] }}
 vrf context {{ vars['id'] }}
   vni {{ vars['vni'] }}
@@ -256,6 +259,17 @@ interface {{ vars['id'] }}
   ip address {{ vars['ipAddress'] }}
 """))
 
+    serviceTemplatesPerType.append(
+                ServiceTemplatePerType(serviceName='ospf',
+                    serviceType='type-1', 
+                    serviceTemplate="""
+router ospf {{ vars['id'] }}
+  bfd
+  router-id {{ vars['routerId'] }}
+  log-adjacency-changes
+  timers lsa-group-pacing {{ vars['lsaGroupPacing'] }}
+  timers lsa-arrival {{ vars['lsaArrival'] }}
+"""))
 
     @classmethod
     def getTemplateByServiceNameAndType(cls, serviceName: str, serviceType: str) -> str:

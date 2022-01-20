@@ -9,7 +9,6 @@ import sot
 import json
 
 class ComplianceReportItem(BaseModel):
-  key: str
   footprint: Union[Dict, List, str]
   original: str
   templated: str
@@ -23,7 +22,7 @@ class ComplianceReportItem(BaseModel):
         vars['id'] = referenceValue.value
 
   @classmethod
-  def generate(cls, serviceName, referenceValues, serviceSotKey, varsFromSot, device, footprint, serviceDefinition, rawCollectionConfigs, rawCollectionFootprints):
+  def generate(cls, serviceName, referenceValues, varsFromSot, device, footprint, serviceDefinition, rawCollectionConfigs, rawCollectionFootprints):
 
     print(f"footprint: {footprint}")
     print(f"referenceValues: {referenceValues.json()}")
@@ -43,7 +42,7 @@ class ComplianceReportItem(BaseModel):
     templated = templating.TemplatedAuxilary.generateTemplated(vars, serviceName, varsFromSot['serviceType']['value'])
     print(f"templated: {templated}")
     
-    complianceReportItem = ComplianceReportItem(key=serviceSotKey, original=original, templated=templated, deviceName=device, footprint=rawCollectionFootprints[device])
+    complianceReportItem = ComplianceReportItem(original=original, templated=templated, deviceName=device, footprint=rawCollectionFootprints[device])
     return complianceReportItem  
 
 class ComplianceReport(BaseModel):
@@ -78,28 +77,23 @@ class ComplianceReport(BaseModel):
     else:
       self.append(complianceReportItem)
 
-  def generate(self, serviceName, footprintKeys, serviceSotKey, siteID, configsFolder, SOTDB, serviceDefinition):
-    for footprintKey in footprintKeys:
+  def generate(self, serviceName, keys: definition.KeysDefinition, siteID, configsFolder, SOTDB, serviceDefinition):
+    for key in keys:
 
-      print(f"go for key: {footprintKey}")
+      print(f"go for key: {key.footprintKey}")
 
-      varsFromSot = sot.getVarsFromSoT(SOTDB, siteID, serviceName, serviceSotKey)
-      if not varsFromSot:
-          print(f"can't get SoT values for {serviceName} {serviceSotKey} for folder {configsFolder}")
-          referenceValues = modeling.ReferenceValues()
-          referenceValues.append(modeling.ReferenceValue(id='id', value=footprintKey))
-      else:
-        print(f"vars from SoT: {json.dumps(varsFromSot, sort_keys=True, indent=4)}")
-        referenceValues = modeling.ReferenceValues()
-        referenceValues.append(modeling.ReferenceValue(id='id', value=footprintKey))
+      referenceValues = modeling.ReferenceValues()
+      referenceValues.append(modeling.ReferenceValue(id='id', value=key.footprintKey))
+
+      varsFromSot = sot.getVarsFromSoT(SOTDB, siteID, serviceName, key.SoTKey)
+      if varsFromSot:
         referenceValues = modeling.getDirectVarsValues(referenceValues, varsFromSot)
 
       rawCollectionConfigs, rawCollectionFootprints = modeling.generateFootprintDB(serviceDefinition, configsFolder, referenceValues)
 
       for device, footprint in rawCollectionFootprints.items():
         if footprint:
-          complianceReportItem = ComplianceReportItem.generate(serviceName, referenceValues, serviceSotKey, varsFromSot, device, footprint, serviceDefinition, rawCollectionConfigs, rawCollectionFootprints)
-          #print(complianceReportItem.json())
+          complianceReportItem = ComplianceReportItem.generate(serviceName, referenceValues, varsFromSot, device, footprint, serviceDefinition, rawCollectionConfigs, rawCollectionFootprints)
           self.update(complianceReportItem)
 
 class ConsistencyReport(BaseModel):
@@ -126,3 +120,16 @@ class TTPDB(BaseModel):
   @classmethod
   def generate(cls, serviceName, configsFolder):
     modeling.generateTTPDB(serviceName, configsFolder)
+  
+def combinedCompianceReport(serviceDescriptionJSON: str):
+    serviceDescription = definition.ServiceDescription.parse_raw(serviceDescriptionJSON)
+    complianceReport = ComplianceReport()  
+
+    for serviceItem in serviceDescription.serviceItems:
+        serviceDefinition = definition.ServiceDefinition.parse_file(f"services/serviceDefinitions/{serviceItem.serviceName}.json")
+        complianceReport.generate(serviceItem.serviceName, serviceItem.keys, serviceDescription.siteID, serviceDescription.configsFolder, serviceDescription.SOTDB, serviceDefinition)
+
+    for item in complianceReport:
+        item.footprint = json.dumps(item.footprint) 
+
+    return complianceReport.json()

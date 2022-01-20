@@ -1,21 +1,38 @@
 import json
 import compliance
+import definition
 
-serviceName = 'underlay'
-serviceKey = 'Ethernet1/51'
-siteID = 'VTB'
-configsFolder = 'RawConfigs/configTestNew'
-SOTDB = 'dataModel.json' 
+serviceDescriptionJSON = """
+{
+    "siteID": "VTB",
+    "configsFolder": "RawConfigs/configTest",
+    "SOTDB": "dataModel.json",
+    "serviceItems": [
+        {
+            "serviceName": "UnderlayInterface",
+            "keys": [
+                {
+                    "footprintKey": "Ethernet1/51", 
+                    "SoTKey": "general"
+                },
+                {
+                    "footprintKey": "Ethernet1/52", 
+                    "SoTKey": "general"
+                }
+            ]
+        },
+        {
+            "serviceName": "ospf",
+            "keys": [
+                {
+                    "footprintKey": "Underlay", 
+                    "SoTKey": "general"
+                }
+            ]
+        }
+    ]
+}
+"""
 
+print(compliance.combinedCompianceReport(serviceDescriptionJSON))
 
-compliance.TTPDB.generate(serviceName, configsFolder)
-
-consistencyReport = compliance.ConsistencyReport.generate(serviceName, serviceKey, siteID, configsFolder, SOTDB)
-for k, v in consistencyReport.items():
-  print(k)
-  print(v.devices)
-  print(json.dumps(v.config, sort_keys=True, indent=4))   
-
-
-""" complianceReport = compliance.ComplianceReport.generate(serviceName, serviceKey, siteID, configsFolder, SOTDB)
-print(complianceReport.json())   """
