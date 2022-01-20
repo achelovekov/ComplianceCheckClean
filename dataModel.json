@@ -47,7 +47,7 @@
               "type": "source",
               "path": "bgp/vrfLite/vrfIpv4Unicast/redistributeDirectRMap",
               "value": "${var}"
-            },            
+            },
             "redistributeDirectRMapSeq": {
               "type": "source",
               "path": "routeMap/seq",
@@ -262,6 +262,66 @@
               "type": "source",
               "path": "bgp/vrfLite/routerId",
               "value": "${var}"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "serviceName": "UnderlayInterface",
+    "serviceVars": [
+      {
+        "siteID": "VTB",
+        "siteVars": [
+          {
+            "id": {
+              "type": "direct",
+              "value": "general"
+            },
+            "ipAddress": {
+              "type": "source",
+              "path": "interfaces/l3PhysIf/ipAddress",
+              "value": "${var}"
+            },
+            "serviceType": {
+              "type": "direct",
+              "value": "type-1"
+            }
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "serviceName": "ospf",
+    "serviceVars": [
+      {
+        "siteID": "VTB",
+        "siteVars": [
+          {
+            "id": {
+              "type": "direct",
+              "value": "general"
+            },
+            "lsaArrival": {
+              "type": "source",
+              "path": "ospf/lsaArrival",
+              "value": "${var}"
+            },
+            "lsaGroupPacing": {
+              "type": "source",
+              "path": "ospf/lsaGroupPacing",
+              "value": "${var}"
+            },
+            "bfd": {
+              "type": "source",
+              "path": "ospf/bfd",
+              "value": "${var}"
+            },
+            "serviceType": {
+              "type": "direct",
+              "value": "type-1"
             }
           }
         ]

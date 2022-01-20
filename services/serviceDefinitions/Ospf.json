@@ -1,0 +1,9 @@
+{
+    "serviceName": "ospf",
+    "footprintDefinition": "services/footprintDefinitions/ospf.json",
+    "streeDefinition": "services/streeDefinitions/ospf.json",
+    "ttpTemplates": [
+        "ospf"
+    ],
+    "subServices": []
+}
