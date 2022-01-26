@@ -156,27 +156,87 @@ route-map {{ id }} deny {{ seq }}
 <vars>
 # template variable with custom regular expression:
 physIf = "Ethernet\d+\/\d+|mgmt0|port-channel\d+"
+loIf = "loopback\d+"
 </vars>
 
 <group name="interfaces">
 <group name="l3PhysIf*" containsall="ipAddress">
-interface {{ id | re("physIf") }} 
+interface {{ id | re("physIf") | _start_ }} 
+  description {{ description | re(".*") }}
   ip address {{ ipAddress }}
-  mtu {{ mtu | default("default") }}
-  no ip redirects {{ ipv4Redirects | set("False") }}
-  ip redirects {{ ipv4Redirects | set("True") }}
-  no ipv6 redirects {{ ipv6Redirects | set("False") }}
-  ipv6 redirects {{ ipv6Redirects | set("True") }}
+  mtu {{ mtu }}
+  ip redirects {{ ipRedirects | set("true") }}
+  no ip redirects {{ ipRedirects | set("false") }}
+  ipv6 redirects {{ ipv6Redirects | set("true") }}
+  no ipv6 redirects {{ ipv6Redirects | set("false") | }}
+  ip ospf passive-interface {{ ospfPassiveInterface | set("true") }}
+  no ip ospf passive-interface {{ ospfPassiveInterface | set("false") }}
+  ip router ospf {{ ospfProcessId }} area {{ ospfAreaId | let("ospfNetworkType", "broadcast") | let("ospfEnabled", "True")}}
+  ip ospf authentication {{ ospfAuthenticationMethod }}
+  ip ospf network {{ ospfNetworkType }}
+  ip ospf bfd {{ ospfBfdEnabled | set("True") }}
+  ip ospf message-digest-key 1 md5 3 {{ ospfMD5Key }}
+  ip pim bfd-instance {{ pimBfdEnabled | set("True") }}
+  ip pim {{pimMode | let("pimEnabled", "True")}} 
+</group>
+<group name="loIf*">
+interface {{ id | re("loIf") }} 
+  description {{ description | re(".*") }}
+  ip address {{ ipAddress }}
+  ip router ospf {{ospfProcessId}} area {{ospfAreaId}}
+  ip pim {{pimMode}}		
 </group>
 </group>
-"""
+""" 
+
     templates['ospf'] = """
-<group name='ospf'>
+<group name='ospf*'>
 router ospf {{ id }}
   bfd {{ bfd | set("True") | default("False")}}
   router-id {{ routerId | default("none") }}
   timers lsa-group-pacing {{ lsaGroupPacing | default("none") }}
-  timers lsa-arrival {{ lsaArrival | default("none") }}												  
+  timers lsa-arrival {{ lsaArrival | default("none") }}		
+  timers throttle lsa {{ lsaStart }} {{ lsaHold }} {{ lsaMaxWait }}
+  timers throttle spf {{ spfStart }} {{ spfHold }} {{ spfMaxWait }}
+</group>
+"""
+
+    templates['features'] = """
+<group name="features*">
+feature {{ id | re(".*")}}
+</group>
+"""
+
+    templates['bfd'] = """
+<group name="bfd*">
+bfd interval {{ interval }} min_rx {{ minRx }} multiplier {{ multiplier }} 
+{{ id | set("global") }}
+</group>
+"""
+
+    templates['aaa'] = """
+<group name="aaa*">
+aaa authentication login default group {{ authnLoginDefaultGroup }}
+aaa authentication login console group {{ authnLoginConsoleGroup }} 
+aaa authorization config-commands default group {{ authzConfigCommandsDefaultPrimaryGroup }} {{ authzConfigCommandsDefaultBackupGroup }} 
+aaa authorization config-commands default group {{ authzConfigCommandsDefaultPrimaryGroup }}
+aaa authorization commands default group {{ authzCommandsDefaultPrimaryGroup }} {{ authzCommandsDefaultBackupGroup }} 
+aaa authorization commands default group {{ authzCommandsDefaultPrimaryGroup }}
+aaa authorization config-commands console group {{ authzConfigCommandsConsolePrimaryGroup }} {{ authzConfigCommandsConsoleBackupGroup }}
+aaa authorization config-commands console group {{ authzConfigCommandsConsolePrimaryGroup }}
+aaa authorization commands console group {{ authzCommandsConsolePrimaryGroup }} {{ authzCommandsConsoleBackupGroup }} 
+aaa authorization commands console group {{ authzCommandsConsolePrimaryGroup }}
+aaa accounting default group {{ accnDefaultPrimaryGroup }} {{ accnDefaultSecondaryGroup }}
+aaa accounting default group {{ accnDefaultPrimaryGroup }}
+{{ id | set("global") }}
+</group>
+"""
+
+    templates['pim'] = """
+<group name="pim*">
+ip pim rp-address {{ rpAddress }} group-list {{ groupList }}
+ip pim ssm range {{ ssmRange }}
+ip pim bfd {{ bfdEnabled | set("True") | default("False")}}
 </group>
 """
 

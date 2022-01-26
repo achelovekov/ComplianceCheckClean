@@ -1,0 +1,9 @@
+{
+    "serviceName": "loopbackInterface",
+    "footprintDefinition": "services/footprintDefinitions/loopbackInterface.json",
+    "streeDefinition": "services/streeDefinitions/loopbackInterface.json",
+    "ttpTemplates": [
+        "interfaces"
+    ],
+    "subServices": []
+}

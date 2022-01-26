@@ -1,0 +1,189 @@
+[
+  {
+    "serviceName": "l3vni",
+    "siteId": "VTB",
+    "serviceId": "PROD-SRV-APP",
+    "templateType": "type-1",
+    "vars": {
+      "serviceType": {
+        "type": "direct",
+        "path": null,
+        "value": "type-1"
+      },
+      "idNum": {
+        "type": "direct",
+        "path": null,
+        "value": "173"
+      },
+      "vni": {
+        "type": "direct",
+        "path": null,
+        "value": "1733601"
+      },
+      "sviId": {
+        "type": "direct",
+        "path": null,
+        "value": "3601"
+      },
+      "asNum": {
+        "type": "direct",
+        "path": null,
+        "value": "64517"
+      },
+      "description": {
+        "type": "relative",
+        "path": null,
+        "value": "L3_VNI_FOR_${id}_${vni}"
+      },
+      "vrfName": {
+        "type": "relative",
+        "path": null,
+        "value": "VRF_${id}"
+      },
+      "sourceVar": {
+        "type": "source",
+        "path": "l3Inst/vnid",
+        "value": "${var}_[blabla]_${vrfName}"
+      },
+      "redistributeDirectRMap": {
+        "type": "source",
+        "path": "bgp/vrfLite/vrfIpv4Unicast/redistributeDirectRMap",
+        "value": "${var}"
+      },
+      "redistributeDirectRMapSeq": {
+        "type": "source",
+        "path": "routeMap/seq",
+        "value": "${var}"
+      },
+      "stalePathTime": {
+        "type": "source",
+        "path": "bgp/vrfLite/stalePathTime",
+        "value": "${var}"
+      },
+      "multipathRelax": {
+        "type": "source",
+        "path": "bgp/vrfLite/multipathRelax",
+        "value": "${var}"
+      },
+      "routerId": {
+        "type": "source",
+        "path": "bgp/vrfLite/routerId",
+        "value": "${var}"
+      }
+    }
+  },
+  {
+    "serviceName": "loopbackInterface",
+    "siteId": "VTB",
+    "serviceId": "general",
+    "templateType": "type-1",
+    "vars": {
+      "ospfProcessId": {
+        "type": "direct",
+        "value": "UNDERLAY"
+      },
+      "ospfAreaId": {
+        "type": "direct",
+        "value": "0.0.0.0"
+      },
+      "pimMode": {
+        "type": "direct",
+        "value": "sparse-mode"
+      },
+      "ipAddress": {
+        "type": "source",
+        "path": "interfaces/loIf/ipAddress",
+        "value": "${var}"
+      },
+      "description": {
+        "type": "source",
+        "path": "interfaces/loIf/description",
+        "value": "${var}"
+      }
+    }
+  },
+  {
+    "serviceName": "underlayInterface",
+    "siteId": "VTB",
+    "serviceId": "general",
+    "templateType": "type-1",
+    "vars": {
+      "ipAddress": {
+        "type": "source",
+        "path": "interfaces/l3PhysIf/ipAddress",
+        "value": "${var}"
+      },
+      "description": {
+        "type": "source",
+        "path": "interfaces/l3PhysIf/description",
+        "value": "${var}"
+      },
+      "ospfMD5Key": {
+        "type": "source",
+        "path": "interfaces/l3PhysIf/ospfMD5Key",
+        "value": "${var}"
+      }
+    }
+  },
+  {
+    "serviceName": "ospf",
+    "siteId": "VTB",
+    "serviceId": "general",
+    "templateType": "type-1",
+    "vars": {
+      "lsaArrival": {
+        "type": "source",
+        "path": "ospf/lsaArrival",
+        "value": "${var}"
+      },
+      "lsaGroupPacing": {
+        "type": "source",
+        "path": "ospf/lsaGroupPacing",
+        "value": "${var}"
+      },
+      "bfd": {
+        "type": "source",
+        "path": "ospf/bfd",
+        "value": "${var}"
+      },
+      "routerId": {
+        "type": "source",
+        "path": "ospf/routerId",
+        "value": "${var}"
+      }
+    }
+  },
+  {
+    "serviceName": "bfd",
+    "siteId": "VTB",
+    "serviceId": "general",
+    "templateType": "type-1",
+    "vars": {
+      "featureId": {
+        "type": "direct",
+        "value": "bfd"
+      },
+      "footprintKey": {
+        "type": "direct",
+        "value": "global"
+      }
+    }
+  },
+  {
+    "serviceName": "pim",
+    "siteId": "VTB",
+    "serviceId": "general",
+    "templateType": "type-1",
+    "vars": {
+      "footprintKey": {
+        "type": "direct",
+        "value": "global"
+      },
+      "rpAddress": {
+        "type": "source",
+        "path": "pim/rpAddress",
+        "value": "${var}"
+      }
+    }
+  }
+]

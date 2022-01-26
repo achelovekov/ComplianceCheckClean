@@ -1,0 +1,53 @@
+[
+  {
+    "serviceName": "underlayInterface",
+    "siteId": "VTB",
+    "deviceName": "10.5.2.200",
+    "footprintKeys": [
+      "Ethernet1/51",
+      "Ethernet1/52"
+    ]
+  },
+  {
+    "serviceName": "underlayInterface",
+    "siteId": "VTB",
+    "deviceName": "10.5.2.148",
+    "footprintKeys": [
+      "Ethernet1/51",
+      "Ethernet1/52"
+    ]
+  },
+  {
+    "serviceName": "underlayInterface",
+    "siteId": "VTB",
+    "deviceName": "10.5.2.69",
+    "footprintKeys": [
+      "Ethernet1/52",
+      "Ethernet1/53"
+    ]
+  },
+  {
+    "serviceName": "ospf",
+    "siteId": "VTB",
+    "deviceName": "10.5.2.200",
+    "footprintKeys": [
+      "UNDERLAY"
+    ]
+  },
+  {
+    "serviceName": "ospf",
+    "siteId": "VTB",
+    "deviceName": "10.5.2.148",
+    "footprintKeys": [
+      "UNDERLAY"
+    ]
+  },
+  {
+    "serviceName": "ospf",
+    "siteId": "VTB",
+    "deviceName": "10.5.2.69",
+    "footprintKeys": [
+      "UNDERLAY"
+    ]
+  }
+]

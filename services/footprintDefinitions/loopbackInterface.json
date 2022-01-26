@@ -2,11 +2,11 @@
     {
       "path": [
         "interfaces",
-        "l3PhysIf"
+        "loIf"
       ],
       "rootKeys": [
         {
-          "parent": "l3PhysIf",
+          "parent": "loIf",
           "checkReference": [
             {
               "fieldNameToCheck": "id",
@@ -18,23 +18,12 @@
       ],
       "nodesReference": [
         {
-          "nodeName": "l3PhysIf",
+          "nodeName": "loIf",
           "rootKeys": [
-            "id",
             "description",
             "ipAddress",
-            "ipRedirects",
-            "ipv6Redirects",
-            "mtu",
-            "ospfEnabled",
-            "ospfNetworkType",
-            "ospfPassiveInterface",
             "ospfProcessId",
-            "pimEnabled",
-            "pimMode",
-            "ospfBfdEnabled",
-            "pimBfdEnabled",
-            "ospfMD5Key"
+            "pimMode"
           ],
           "nonRootKeys": []
         }

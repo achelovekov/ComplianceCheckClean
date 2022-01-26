@@ -8,6 +8,7 @@ import definition
 from ttpLib import TTPLib
 import os
 from copy import deepcopy
+import sot
 
 class NonRootKey(BaseModel):
   path: Tuple
@@ -103,6 +104,11 @@ class ReferenceValues(BaseModel):
   def updateReferenceValues(self, data: Dict):
     for key, value in data.items():
       self.append(ReferenceValue(id=key, value=value))
+  
+  def updateVarsWithId(self, vars):
+    for referenceValue in self:
+      if referenceValue.id == 'id':
+        vars['id'] = referenceValue.value
 
 class RootElement(BaseModel):
   path: List = []
@@ -129,7 +135,8 @@ def getNodeNestedData(object: Dict, keyIndex: int, key: NonRootKey, result: Dict
   if keyIndex == len(key.path):
     try:
       for key in key.keys:
-        result[key] = object[key]
+        if key in object:
+          result[key] = object[key]
     except (TypeError, KeyError) as e:
       print(f"{e} with key: {key} result: {result} object: {object}")
     return
@@ -143,7 +150,8 @@ def getNodeData(object: Dict, keys: Tuple[Tuple, NonRootKey]):
   rootKeys, nonRootKeys = keys[0], keys[1]
 
   for rootKey in rootKeys:
-    result[rootKey] = object[rootKey] 
+    if rootKey in object:
+      result[rootKey] = object[rootKey] 
   for nonRootKey in nonRootKeys: 
     getNodeNestedData(object, 0, nonRootKey, result)
   
@@ -218,13 +226,13 @@ def goRef(object: Dict, rootElement: RootElement, candidate: Dict, referenceValu
   else:
     pass
 
-def getDirectVarsValues(referenceValues: ReferenceValues, varsFromSot: Dict) -> ReferenceValues:
+def getDirectVarsValues(referenceValues: ReferenceValues, soTDBItem: sot.SoTDBItem) -> ReferenceValues:
 
     processedData = {}
-    for variable, definition in varsFromSot.items():
+    for variable, definition in soTDBItem.vars.items():
       if definition:
-        if definition['type'] == 'direct' and 'value' in definition and variable != "id":
-            processedData[variable] = definition['value'] 
+        if definition.type == 'direct':
+            processedData[variable] = definition.value 
     
     referenceValues.updateReferenceValues(processedData)
   
@@ -260,12 +268,9 @@ def candidateGenerate(referenceValues: ReferenceValues, parsedData: Dict, servic
     return candidate
 
 def generateFootprint(serviceDefinition: definition.ServiceDefinition, rawConfig, referenceValues):
-    if serviceDefinition.subServices:
-        for subService in serviceDefinition.subServices:
-            generateFootprint(subService, rawConfig, referenceValues)
-    else:
-        parsedData = TTPLib.parser(rawConfig, serviceDefinition.ttpTemplates)
-        #print(json.dumps(parsedData, sort_keys=True, indent=4))
+
+    parsedData = TTPLib.parser(rawConfig, serviceDefinition.ttpTemplates)
+    #print(json.dumps(parsedData, sort_keys=True, indent=4))
 
     if serviceDefinition.footprintDefinition:
         footprint = candidateGenerate(referenceValues, parsedData, serviceDefinition)
@@ -325,3 +330,4 @@ def generateTTPDB(serviceName: str, rawInventoryFolder: str):
     parsedData = TTPLib.parser(rawConfig, serviceDefinition.ttpTemplates)
     print(f"Parsed data for device: {device}")
     print(json.dumps(parsedData, sort_keys=True, indent=4))
+

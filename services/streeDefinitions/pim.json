@@ -1,0 +1,14 @@
+[
+    {
+      "path": "feature",
+      "filter": [],
+      "let": ["pim"],
+      "pathPrepend": "True"
+    },
+    {
+      "path": "ip pim",
+      "filter": [],
+      "let": "all",
+      "pathPrepend": "True"
+    }
+  ]

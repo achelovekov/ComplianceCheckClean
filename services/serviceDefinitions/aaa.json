@@ -1,0 +1,9 @@
+{
+    "serviceName": "aaa",
+    "footprintDefinition": "services/footprintDefinitions/aaa.json",
+    "streeDefinition": "services/streeDefinitions/aaa.json",
+    "ttpTemplates": [
+        "aaa"
+    ],
+    "subServices": []
+}

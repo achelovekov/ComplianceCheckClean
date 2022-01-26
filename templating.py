@@ -17,39 +17,36 @@ def getDictValueByPath(data:Dict, path:List) -> Any:
 def pathTransform(data:str):
     return data.split('/')
 
-def processVariables(data:Dict, originalData:Dict):
+def processVariables(soTDBItem: sot.SoTDBItem, fooprint:Dict):
 
     newData = {}
     regex = '\${([a-zA-Z]+)}'
-    for variable, definition in data.items():
+    for variable, definition in soTDBItem.vars.items():
         try:
             if definition:
-                if definition['type'] == 'direct' and 'value' in definition:
-                    newData[variable] = definition['value'] 
-                if definition['type'] == 'direct' and 'values' in definition:
+                if definition.type == 'direct' and definition.value:
+                    newData[variable] = definition.value
+                if definition.type == 'direct' and definition.values:
                     newData[variable] = li = []
-                    for value in definition['values']:
+                    for value in definition.values:
                         li.append(value)
-                if definition['type'] == 'relative':
+                if definition.type == 'relative':
                     mapping = {}
-                    template = Template(definition['value'])
-                    for item in re.finditer(regex, definition['value']):
+                    template = Template(definition.value)
+                    for item in re.finditer(regex, definition.value):
                         mapping[item.group(1)] = newData[item.group(1)]
                     newData[variable] = template.substitute(**mapping)
-                if definition['type'] == 'source':
-                    template = Template(definition['value'])
+                if definition.type == 'source':
+                    template = Template(definition.value)
                     mapping = {}
-                    for item in re.finditer(regex, definition['value']):
+                    for item in re.finditer(regex, definition.value):
                         if item.group(1) == 'var':
-                            mapping[item.group(1)] = getDictValueByPath(originalData, pathTransform(definition['path']))
+                            mapping[item.group(1)] = getDictValueByPath(fooprint, pathTransform(definition.path))
                         else: 
                             mapping[item.group(1)] = newData[item.group(1)]
                     newData[variable] = template.substitute(**mapping)
         except TypeError as e:
             print(f"may be ttpLib parsing error with {variable} {definition}")
-
-    if 'id' in newData:
-        del newData['id']
 
     return newData
 
@@ -57,6 +54,7 @@ class STreeServiceProcessedItem(BaseModel):
     path: List[str] = []
     filter: Union[List[str], str] = []
     let:  Union[List[str], str] = []
+    pathPrepend: Optional[bool] 
     children: Optional[List['STreeServiceProcessedItem']] = []
 
 STreeServiceProcessedItem.update_forward_refs()
@@ -78,6 +76,7 @@ class STreeServiceItem(BaseModel):
     filter: Union[List[str], str]
     let:  Union[List[str], str]
     children: Optional[List['STreeServiceItem']]
+    pathPrepend: Optional[bool] = False
 
 STreeServiceItem.update_forward_refs()
 
@@ -107,6 +106,8 @@ class STreeService(BaseModel):
 
         sTreeServiceProcessedItem.filter = sTreeServiceItem.filter
         sTreeServiceProcessedItem.let = sTreeServiceItem.let
+        if sTreeServiceItem.pathPrepend:
+            sTreeServiceProcessedItem.pathPrepend = sTreeServiceItem.pathPrepend
 
         if sTreeServiceItem.children:
             for child in sTreeServiceItem.children:
@@ -126,8 +127,9 @@ class STreeService(BaseModel):
 
 def printItem(prefix: str, content: List, bias: int):
     res = []
-    prefix = " "*2*bias + ' '.join(prefix)
-    res.append(prefix)
+    if prefix:
+        prefix = " "*2*bias + ' '.join(prefix)
+        res.append(prefix)
     for line in content:
         line = " "*2*bias + line
         res.append(line)
@@ -138,10 +140,13 @@ def processItem(rootNode: Node, sTreeServiceProcessedItem: STreeServiceProcessed
     if "all" in sTreeServiceProcessedItem.filter:
         printBuf = []
     else:
-        printBuf = printPath(rootNode, path, sTreeServiceProcessedItem.filter, sTreeServiceProcessedItem.let)
+        printBuf = printPath(rootNode, path, sTreeServiceProcessedItem.filter, sTreeServiceProcessedItem.let, sTreeServiceProcessedItem.pathPrepend)
     
-    if sTreeServiceProcessedItem.children or printBuf:
-        buf.append(printItem(sTreeServiceProcessedItem.path, printBuf, bias))
+    if (sTreeServiceProcessedItem.children or printBuf):
+        if sTreeServiceProcessedItem.pathPrepend:
+            buf.append(printItem(None, printBuf, bias))
+        else: 
+            buf.append(printItem(sTreeServiceProcessedItem.path, printBuf, bias))
 
     if sTreeServiceProcessedItem.children:
         for child in sTreeServiceProcessedItem.children:
@@ -182,7 +187,7 @@ class TemplatedAuxilary():
     serviceTemplatesPerType = ServiceTemplatesPerType()
 
     serviceTemplatesPerType.append(
-                ServiceTemplatePerType(serviceName='L3VNI',
+                ServiceTemplatePerType(serviceName='l3vni',
                     serviceType='type-1', 
                     serviceTemplate="""
 vlan {{ vars['sviId'] }}
@@ -204,7 +209,7 @@ route-map {{ vars['redistributeDirectRMap'] }} permit {{ vars['redistributeDirec
 """))
 
     serviceTemplatesPerType.append(
-                ServiceTemplatePerType(serviceName='L2VNI',
+                ServiceTemplatePerType(serviceName='l2vni',
                     serviceType='type-1', 
                     serviceTemplate="""
 vlan 1202
@@ -218,8 +223,6 @@ interface nve1
   member vni 227952
     suppress-arp
     mcast-group 239.255.0.20
-
-
 """))
 
     serviceTemplatesPerType.append(
@@ -252,11 +255,24 @@ route-map {{ vars['redistributeDirectRMap'] }} permit {{ vars['redistributeDirec
 """))
 
     serviceTemplatesPerType.append(
-                ServiceTemplatePerType(serviceName='UnderlayInterface',
+                ServiceTemplatePerType(serviceName='underlayInterface',
                     serviceType='type-1', 
                     serviceTemplate="""
 interface {{ vars['id'] }}
+  description {{ vars['description'] }}
+  mtu 9216
+  no ip redirects
   ip address {{ vars['ipAddress'] }}
+  no ipv6 redirects
+  ip ospf authentication message-digest
+  ip ospf message-digest-key 1 md5 3 {{ vars['ospfMD5Key'] }}
+  ip ospf network point-to-point
+  no ip ospf passive-interface
+  ip router ospf UNDERLAY area 0.0.0.0
+  ip ospf bfd
+  ip pim bfd-instance
+  ip pim sparse-mode
+  no shutdown
 """))
 
     serviceTemplatesPerType.append(
@@ -267,8 +283,39 @@ router ospf {{ vars['id'] }}
   bfd
   router-id {{ vars['routerId'] }}
   log-adjacency-changes
+  timers throttle spf 10 100 5000
   timers lsa-group-pacing {{ vars['lsaGroupPacing'] }}
   timers lsa-arrival {{ vars['lsaArrival'] }}
+  timers throttle lsa 10 100 5000
+"""))
+
+    serviceTemplatesPerType.append(
+                ServiceTemplatePerType(serviceName='loopbackInterface',
+                    serviceType='type-1', 
+                    serviceTemplate="""
+interface {{ vars['id'] }}
+  description {{ vars['description'] }}
+  ip address {{ vars['ipAddress'] }}
+  ip router ospf UNDERLAY area 0.0.0.0
+  ip pim sparse-mode
+"""))
+
+    serviceTemplatesPerType.append(
+                ServiceTemplatePerType(serviceName='bfd',
+                    serviceType='type-1', 
+                    serviceTemplate="""
+feature bfd
+bfd interval 250 min_rx 250 multiplier 3
+"""))
+
+    serviceTemplatesPerType.append(
+                ServiceTemplatePerType(serviceName='pim',
+                    serviceType='type-1', 
+                    serviceTemplate="""
+feature pim
+ip pim rp-address {{ vars['rpAddress'] }} group-list 239.255.0.0/24
+ip pim ssm range 232.0.0.0/8
+ip pim bfd
 """))
 
     @classmethod

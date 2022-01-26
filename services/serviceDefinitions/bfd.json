@@ -1,0 +1,10 @@
+{
+    "serviceName": "bfd",
+    "footprintDefinition": "services/footprintDefinitions/bfd.json",
+    "streeDefinition": "services/streeDefinitions/bfd.json",
+    "ttpTemplates": [
+        "bfd",
+        "features"
+    ],
+    "subServices": []
+}

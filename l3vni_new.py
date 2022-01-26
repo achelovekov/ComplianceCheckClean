@@ -12,14 +12,11 @@ auxilaryDBFile = 'AuxilaryDB.json'
 serviceItemsJSON = """
 [
         {
-            "serviceName": "UnderlayInterface",
-            "footprintKeysType": "dynamic",
-            "SoTKeysType": "general"
-        },
-        {
-            "serviceName": "ospf",
-            "footprintKeysType": "dynamic",
-            "SoTKeysType": "general"
+            "serviceName": "L3VNI",
+            "footprintKeysType": "static",
+            "footprintKeys": [
+               "PROD-SRV-APP"],
+            "SoTKeysType": "specific"
         }
     ]
 """

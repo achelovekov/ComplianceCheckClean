@@ -1,7 +1,7 @@
 {
-    "serviceName": "L2VNI",
-    "footprintDefinition": "services/footprintDefinitions/L2VNI.json",
-    "streeDefinition": "services/streeDefinitions/L2VNI.json",
+    "serviceName": "l2vni",
+    "footprintDefinition": "services/footprintDefinitions/l2vni.json",
+    "streeDefinition": "services/streeDefinitions/l2vni.json",
     "ttpTemplates": [
         "l2BD",
         "sviIf",

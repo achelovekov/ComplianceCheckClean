@@ -90,21 +90,28 @@ def biasChildren(node:Node) -> bool:
             res = res and False
     return res
 
-def printNode(node:Node, depth, step, tmpStr, buf, filter):
+def printNode(node:Node, depth, step, tmpStr, buf, filter, pathPrepend):
     try:
         for child in node.children:
             if child.name not in filter:
-                if not child.bias:
+                if not child.bias and not pathPrepend:
                     tmpStr = tmpStr + " " + child.name
                     if len(child.children) == 0 or biasChildren(child):
                         buf.append(tmpStr)
-                    printNode(child, depth, step, tmpStr, buf, filter)
+                    printNode(child, depth, step, tmpStr, buf, filter, pathPrepend)
+                if not child.bias and pathPrepend:
+                    tmpStr = child.name
+                    if len(child.children) == 0 or biasChildren(child):
+                        buf.append(tmpStr)
+                    pathPrepend = False
+                    printNode(child, depth, step, tmpStr, buf, filter, pathPrepend)
                 if child.bias:
+                    pathPrepend = False
                     newDepth = depth + 1
                     tmpStr = " "*newDepth*step + child.name
                     if len(child.children) == 0:
                         buf.append(tmpStr)
-                    printNode(child, newDepth, step, tmpStr, buf, filter)
+                    printNode(child, newDepth, step, tmpStr, buf, filter, pathPrepend)
     except AttributeError as e:
         print(f"may be wrong path? {e}")
         exit()
@@ -140,7 +147,8 @@ def printPath(
         rootNode: Node, 
         path: List, 
         filter: Union[List, str],
-        let: Union[List, str]
+        let: Union[List, str],
+        pathPrepend: bool
         ):
 
     nodeBuf = []
@@ -151,25 +159,29 @@ def printPath(
     cleanSubTreeWithLet(nodeBuf, let)
 
     for node in nodeBuf:
-        printNode(node, 0, 2, '', printBuf, filter)
+        if pathPrepend and node.children: 
+            for child in node.children:
+                child.name = ' '.join(path) + " " + child.name
+        printNode(node, 0, 2, '', printBuf, filter, pathPrepend)
 
     return printBuf
 
 if __name__ == "__main__":
 
     device = '10.5.2.69'
-
     rootNode = streeFromFile(f"RawConfigs/configTest/{device}/{device}-running.txt")
 
-    print(rootNode.json())
+    #rootNode = streeFromFile(f"asa_test.txt")
+
+    #print(rootNode.json())
 
     path = [
-        "vlan",
-        "3601"
+        "ip",
+        "pim"
       ]
     filter = []
-    let = "any"
+    let = "all"
 
-    printBuf = printPath(rootNode, path, filter, let)
-    #print('\n'.join(printBuf))  
+    printBuf = printPath(rootNode, path, filter, let, True)
+    print('\n'.join(printBuf))  
     

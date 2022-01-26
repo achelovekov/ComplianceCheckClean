@@ -1,84 +1,45 @@
 from __future__ import annotations
 
-from typing import Dict, List, Optional
+from typing import Dict, List, Optional, Union
 from pydantic import BaseModel
 
 
 class Var(BaseModel):
     type: str  
     path: Optional[str] 
-    value: str  
+    value: Optional[str]
+    values: Optional[List[str]]
 
-class SiteVar(BaseModel):
-    serviceType: Optional[Var]
-    id: Optional[Var]
-    idNum: Optional[Var]
-    vni: Optional[Var]
-    sviId: Optional[Var]
-    asNum: Optional[Var]
-    description: Optional[Var]
-    vrfName: Optional[Var]
-    sourceVar: Optional[Var]
-    redistributeDirectRMap: Optional[Var]
-    stalePathTime: Optional[Var]
-    multipathRelax: Optional[Var]
-    routerId: Optional[Var]
-    redistributeDirectRMapSeq: Optional[Var]
-    ipAddress: Optional[Var]
-    lsaGroupPacing: Optional[Var]
-    lsaArrival: Optional[Var]
-    bfd: Optional[Var]
-
-class ServiceVar(BaseModel):
-    siteID: str
-    siteVars: List[SiteVar]
-
-
-class ServiceItem(BaseModel):
+class SoTDBItem(BaseModel):
     serviceName: str
-    serviceVars: List[ServiceVar]
+    siteId: str
+    serviceId: str
+    templateType: str
+    vars: Dict[str, Var]
 
+class SoTDB(BaseModel):
+    __root__: List[SoTDBItem] 
 
-class ServiceSoT(BaseModel):
-    __root__: List[ServiceItem]
-
-    def append(self, serviceItem:ServiceItem):
-        self.__root__.append(serviceItem)
+    def append(self, soTDBItem:SoTDBItem):
+        self.__root__.append(soTDBItem)
   
     def __iter__(self):
         return iter(self.__root__)
 
-    def getService(self, serviceName):
-        for serviceItem in self:
-            if serviceItem.serviceName == serviceName: 
-                return serviceItem
-        return None
-    
-    def getSite(self, serviceItem, siteID):
-        for siteItem in serviceItem.serviceVars:
-            if siteItem.siteID == siteID:
-                return siteItem
-        return None
-    
-    def getKey(self, siteItem, key):
-        for keyItem in siteItem.siteVars:
-            if keyItem.id.value == key:
-                return keyItem
+    def getSoTDBItem(self, serviceName, siteId, SoTKey) -> Dict:
+        for item in self:
+            if (item.serviceName == serviceName and
+                item.siteId == siteId and
+                item.serviceId == SoTKey):
+                return item
+        print(f"Can't get SoT for: {serviceName}, {siteId}, {SoTKey}")
         return None
 
-    def getVarsByKey(self, serviceName, siteID, key) -> Dict:
-        if serviceItem := self.getService(serviceName):
-            if siteItem := self.getSite(serviceItem, siteID):
-                if keyItem := self.getKey(siteItem, key):
-                    return keyItem.dict()
-                else:
-                    return None
-            else:
-                return None
-        else:
-            return None
+""" SoTDBFile = 'SoTDB.json'
+soTDB = SoTDB.parse_file(SoTDBFile)
 
-def getVarsFromSoT(filename, siteID, serviceName, key) -> Dict:
-    serviceSoT = ServiceSoT.parse_file(filename)
-    return serviceSoT.getVarsByKey(serviceName, siteID, key)
+print(soTDB.getSoTDBItem('l3vni','VTB','PROD-SRV-APP')) """
 
+var = Var(type='a', value='b')
+
+print(var.json())

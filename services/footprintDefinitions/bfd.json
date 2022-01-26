@@ -1,0 +1,56 @@
+[
+    {
+      "path": [
+        "features"
+      ],
+      "rootKeys": [
+        {
+          "parent": "features",
+          "checkReference": [
+            {
+              "fieldNameToCheck": "id",
+              "referenceAliasToRead": "featureId"
+            }
+          ],
+          "setReference": []
+        }
+      ],
+      "nodesReference": [
+        {
+          "nodeName": "features",
+          "rootKeys": [
+            "id"
+          ],
+          "nonRootKeys": []
+        }
+      ]
+    },    
+    {
+        "path": [
+          "bfd"
+        ],
+        "rootKeys": [
+          {
+            "parent": "bfd",
+            "checkReference": [
+              {
+                "fieldNameToCheck": "id",
+                "referenceAliasToRead": "footprintKey"
+              }
+            ],
+            "setReference": []
+          }
+        ],
+        "nodesReference": [
+          {
+            "nodeName": "bfd",
+            "rootKeys": [
+              "interval",
+              "minRx",
+              "multiplier"
+            ],
+            "nonRootKeys": []
+          }
+        ]
+      }
+]

@@ -1,0 +1,57 @@
+[
+    {
+      "path": [
+        "features"
+      ],
+      "rootKeys": [
+        {
+          "parent": "features",
+          "checkReference": [
+            {
+              "fieldNameToCheck": "id",
+              "referenceAliasToRead": "featureId"
+            }
+          ],
+          "setReference": []
+        }
+      ],
+      "nodesReference": [
+        {
+          "nodeName": "features",
+          "rootKeys": [
+            "id"
+          ],
+          "nonRootKeys": []
+        }
+      ]
+    },    
+    {
+        "path": [
+          "pim"
+        ],
+        "rootKeys": [
+          {
+            "parent": "pim",
+            "checkReference": [
+              {
+                "fieldNameToCheck": "id",
+                "referenceAliasToRead": "footprintKey"
+              }
+            ],
+            "setReference": []
+          }
+        ],
+        "nodesReference": [
+          {
+            "nodeName": "pim",
+            "rootKeys": [
+              "bfdEnabled",
+              "groupList",
+              "rpAddress",
+              "ssmRange"
+            ],
+            "nonRootKeys": []
+          }
+        ]
+      }
+]

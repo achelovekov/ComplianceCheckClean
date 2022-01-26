@@ -1,4 +1,6 @@
 from ast import Str
+from pstats import SortKey
+from xxlimited import foo
 from pydantic import BaseModel
 from typing import Any, Tuple, List, Dict, Union
 
@@ -7,43 +9,54 @@ import definition
 import templating
 import sot
 import json
+import auxilary
 
 class ComplianceReportItem(BaseModel):
-  footprint: Union[Dict, List, str]
-  original: str
-  templated: str
+  footprint: Union[Dict, List, str] = dict()
+  original: str = ''
+  templated: str = ''
   deviceName: str
 
 
   @classmethod
-  def updateVarsWithId(cls, referenceValues, vars):
-    for referenceValue in referenceValues:
-      if referenceValue.id == 'id':
-        vars['id'] = referenceValue.value
+  def generate(cls, referenceValues: modeling.ReferenceValues, soTDBItem: sot.SoTDBItem, deviceName, footprint, serviceDefinition, rawCollection):
 
-  @classmethod
-  def generate(cls, serviceName, referenceValues, varsFromSot, device, footprint, serviceDefinition, rawCollectionConfigs, rawCollectionFootprints):
+    vars = templating.processVariables(soTDBItem, footprint)
+    referenceValues.updateVarsWithId(vars)
 
-    print(f"footprint: {footprint}")
-    print(f"referenceValues: {referenceValues.json()}")
-
-    vars = templating.processVariables(varsFromSot, footprint)
-    ComplianceReportItem.updateVarsWithId(referenceValues, vars)
     print(f"vars: {json.dumps(vars, sort_keys=True, indent=4)}")
-    
+
+
     sTreeService = templating.STreeService.parse_file(serviceDefinition.streeDefinition)
     sTreeServiceProcessed = sTreeService.process(vars)
-    rootNode = templating.streeFromConfig(rawCollectionConfigs[device])
+    rootNode = templating.streeFromConfig(rawCollection[deviceName])
     result = []
     templating.genereteStreeOriginal(sTreeServiceProcessed, rootNode, result)
     original = '\n'.join(result)
-    print(f"original: {original}")
+    print(f"original:")
+    print(f"{original}")
 
-    templated = templating.TemplatedAuxilary.generateTemplated(vars, serviceName, varsFromSot['serviceType']['value'])
-    print(f"templated: {templated}")
+    templated = templating.TemplatedAuxilary.generateTemplated(vars, soTDBItem.serviceName, soTDBItem.templateType)
+
     
-    complianceReportItem = ComplianceReportItem(original=original, templated=templated, deviceName=device, footprint=rawCollectionFootprints[device])
-    return complianceReportItem  
+    print(f"templated {templated}")
+    
+    return original, templated
+
+
+
+  def update(self, footprint, original, templated):
+    if isinstance(self.footprint, Dict):
+      self.footprint = []
+      self.footprint.append(footprint)
+      self.original += '\n' + original
+      self.templated += templated
+      return
+    if isinstance(self.footprint, List):
+      self.footprint.append(footprint)
+      self.original += '\n' + original
+      self.templated += templated
+      return
 
 class ComplianceReport(BaseModel):
   __root__: List[ComplianceReportItem] = []
@@ -60,22 +73,6 @@ class ComplianceReport(BaseModel):
       if item.deviceName == deviceName:
         return item
     return None
-
-  def update(self, complianceReportItem:ComplianceReportItem):
-    if complianceReportItemByDeviceName := self.getComplianceReportItemByDeviceName(complianceReportItem.deviceName):
-      if isinstance(complianceReportItemByDeviceName.footprint, Dict):
-        complianceReportItemByDeviceName.footprint = [complianceReportItemByDeviceName.footprint]
-        complianceReportItemByDeviceName.footprint.append(complianceReportItem.footprint)
-        complianceReportItemByDeviceName.original += '\n' + complianceReportItem.original
-        complianceReportItemByDeviceName.templated += '\n' + complianceReportItem.templated
-        return
-      if isinstance(complianceReportItemByDeviceName.footprint, List):
-        complianceReportItemByDeviceName.footprint.append(complianceReportItem.footprint)
-        complianceReportItemByDeviceName.original += '\n' + complianceReportItem.original
-        complianceReportItemByDeviceName.templated += '\n' + complianceReportItem.templated
-        return
-    else:
-      self.append(complianceReportItem)
 
   def generate(self, serviceName, keys: definition.KeysDefinition, siteID, configsFolder, SOTDB, serviceDefinition):
     for key in keys:
@@ -120,16 +117,108 @@ class TTPDB(BaseModel):
   @classmethod
   def generate(cls, serviceName, configsFolder):
     modeling.generateTTPDB(serviceName, configsFolder)
+
+#####################
+class Key(BaseModel):
+  footprintKey: str
+  SoTKey: str
+
+class Service(BaseModel):
+  serviceName: str
+  serviceKeys: List[Key] = []
+
+class ComplianceReferenceDBItem(BaseModel):
+  deviceName: str
+  services: List[Service] = []
+
+class ComplianceReferenceDB(BaseModel):
+  __root__: List[ComplianceReferenceDBItem] = []
+
+  def append(self, complianceReferenceDBItem:ComplianceReferenceDBItem):
+    self.__root__.append(complianceReferenceDBItem)
+
+  def __iter__(self):
+    return iter(self.__root__)
+
+def generateComplianceReferenceDB(
+  serviceItems: definition.ServiceItems, 
+  auxilaryDB: auxilary.AuxilaryDB,
+  siteId: str,
+  deviceNames: List[str]):
+
+  complianceReferenceDB = ComplianceReferenceDB()
+
+  for deviceName in deviceNames:
+    complianceReferenceDBItem = ComplianceReferenceDBItem(deviceName=deviceName)
+    for serviceItem in serviceItems:
+      service = Service(serviceName=serviceItem.serviceName)
+      if serviceItem.footprintKeysType == 'static':
+        footprintKeys = serviceItem.footprintKeys
+      if serviceItem.footprintKeysType == 'dynamic':
+        footprintKeys = auxilaryDB.getDynamicKeys(serviceItem.serviceName, siteId, deviceName)
+        print(f"footprintKeys: {footprintKeys}")
+      if serviceItem.footprintKeysType == 'none':
+        footprintKeys = ["none"]
+      for footprintKey in footprintKeys:
+        if serviceItem.SoTKeysType == 'general':
+          key = Key(footprintKey=footprintKey, SoTKey='general')
+        if serviceItem.SoTKeysType == 'specific':
+          key = Key(footprintKey=footprintKey, SoTKey=footprintKey)
+        service.serviceKeys.append(key)
+      complianceReferenceDBItem.services.append(service)
   
-def combinedCompianceReport(serviceDescriptionJSON: str):
-    serviceDescription = definition.ServiceDescription.parse_raw(serviceDescriptionJSON)
-    complianceReport = ComplianceReport()  
+    complianceReferenceDB.append(complianceReferenceDBItem)
+  
+  return complianceReferenceDB
+#####################
 
-    for serviceItem in serviceDescription.serviceItems:
-        serviceDefinition = definition.ServiceDefinition.parse_file(f"services/serviceDefinitions/{serviceItem.serviceName}.json")
-        complianceReport.generate(serviceItem.serviceName, serviceItem.keys, serviceDescription.siteID, serviceDescription.configsFolder, serviceDescription.SOTDB, serviceDefinition)
+def combinedCompianceReport(
+  configsFolder: str, 
+  serviceItems: definition.ServiceItems, 
+  auxilaryDB: auxilary.AuxilaryDB, 
+  siteId: str,
+  SoTDB: sot.SoTDB
+  ) -> ComplianceReport:
 
-    for item in complianceReport:
-        item.footprint = json.dumps(item.footprint) 
+  rawCollection = modeling.generateRawCollection(configsFolder)
 
-    return complianceReport.json()
+  complianceReferenceDB = generateComplianceReferenceDB(serviceItems, auxilaryDB, siteId, rawCollection.keys())
+
+  print(complianceReferenceDB.json())
+ 
+  complianceReport = ComplianceReport()
+
+  for complianceReferenceDBItem in complianceReferenceDB:
+    print(f"go for {complianceReferenceDBItem.deviceName}")
+    complianceReportItem = ComplianceReportItem(deviceName=complianceReferenceDBItem.deviceName)
+    for service in complianceReferenceDBItem.services:
+      serviceDefinition = definition.getServiceDefinitionByName(service.serviceName)
+
+      for serviceKey in service.serviceKeys:
+        referenceValues = modeling.ReferenceValues()
+        referenceValues.append(modeling.ReferenceValue(id='id', value=serviceKey.footprintKey))
+
+        soTDBItem = SoTDB.getSoTDBItem(service.serviceName, siteId, serviceKey.SoTKey)
+        if soTDBItem:
+          referenceValues = modeling.getDirectVarsValues(referenceValues, soTDBItem)
+        else:
+          raise NotImplementedError(f"not implemented SoT for service {service.serviceName}")
+        print(referenceValues.json())
+
+        if footprint := modeling.generateFootprint(serviceDefinition, rawCollection[complianceReferenceDBItem.deviceName], referenceValues):
+
+          print(f"footprint for {complianceReferenceDBItem.deviceName}: {json.dumps(footprint, sort_keys=True, indent=4)}")
+
+          original, templated = ComplianceReportItem.generate(referenceValues, soTDBItem, complianceReferenceDBItem.deviceName, footprint, serviceDefinition, rawCollection)
+
+          complianceReportItem.update(footprint, original, templated)
+    if complianceReportItem.footprint:
+      complianceReport.append(complianceReportItem)
+  
+  return complianceReport
+
+
+
+
+
+

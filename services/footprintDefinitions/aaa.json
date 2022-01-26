@@ -1,0 +1,29 @@
+[
+    {
+      "path": [
+        "aaa"
+      ],
+      "rootKeys": [
+        {
+          "parent": "aaa",
+          "checkReference": [
+            {
+              "fieldNameToCheck": "id",
+              "referenceAliasToRead": "aaaSectionId"
+            }
+          ],
+          "setReference": []
+        }
+      ],
+      "nodesReference": [
+        {
+          "nodeName": "aaa",
+          "rootKeys": [
+            "authnLoginConsoleGroup",
+            "authnLoginDefaultGroup"
+          ],
+          "nonRootKeys": []
+        }
+      ]
+    }
+]

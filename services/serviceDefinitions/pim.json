@@ -1,0 +1,10 @@
+{
+    "serviceName": "pim",
+    "footprintDefinition": "services/footprintDefinitions/pim.json",
+    "streeDefinition": "services/streeDefinitions/pim.json",
+    "ttpTemplates": [
+        "pim",
+        "features"
+    ],
+    "subServices": []
+}

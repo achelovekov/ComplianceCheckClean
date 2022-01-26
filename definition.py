@@ -12,7 +12,7 @@ ServiceDefinition.update_forward_refs()
 
 class KeyDefinition(BaseModel):
     footprintKey: str
-    SoTKey: str
+    SoTKey: str = ''
 
 class KeysDefinition(BaseModel):
     __root__: List[KeyDefinition] = []
@@ -23,12 +23,34 @@ class KeysDefinition(BaseModel):
     def __iter__(self):
         return iter(self.__root__)
 
-class ServiceItem(BaseModel):
+class ServiceItemProcessed(BaseModel):
     serviceName: str
-    keys: KeysDefinition
+    keys: KeysDefinition = []
 
-class ServiceDescription(BaseModel):
+class ServiceDescriptionProcessed(BaseModel):
     siteID: str
     configsFolder: str
     SOTDB: str
-    serviceItems: List[ServiceItem]
+    serviceItems: List[ServiceItemProcessed] = []
+
+class ServiceItem(BaseModel):
+    serviceName: str
+    footprintKeysType: str #static|dynamic
+    footprintKeys: Optional[List[str]]
+    SoTKeysType: str #general|specific
+
+class ServiceItems(BaseModel):
+    __root__: List[ServiceItem] = []
+
+    def append(self, serviceItem:ServiceItem):
+        self.__root__.append(serviceItem)
+    
+    def __iter__(self):
+        return iter(self.__root__)
+
+def getServiceDefinitionByName(serviceName) -> ServiceDefinition:
+    try:
+        with open(f"services/serviceDefinitions/{serviceName}.json", encoding = 'utf-8') as f:
+            return ServiceDefinition.parse_raw(f.read())
+    except FileNotFoundError as e:
+        print(f"{e}")

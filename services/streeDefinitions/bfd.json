@@ -1,0 +1,14 @@
+[
+  {
+    "path": "feature",
+    "filter": [],
+    "let": ["bfd"],
+    "pathPrepend": "True"
+  },
+  {
+    "path": "bfd",
+    "filter": [],
+    "let": "all",
+    "pathPrepend": "True"
+  }
+]
